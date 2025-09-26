@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 const AccessChecker = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const AccessChecker = () => {
 
       try {
         // Verify token and check if user still has access
-        const response = await axios.get('https://cake-1h0p.onrender.com/api/auth/verify', {
+        const response = await axios.get(`${API_BASE_URL}/api/auth/verify`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         

@@ -6,6 +6,7 @@ import CakeCard from '../components/CakeCard.jsx';
 import Footer from '../components/Footer.jsx';
 import { useCart } from "../components/CartContext";  
 import { useTheme } from "../components/ThemeContext.jsx";  
+import { API_BASE_URL } from '../config/api.js';
 
 function Cake() {
   const [products, setProducts] = useState([]);
@@ -31,7 +32,7 @@ function Cake() {
 
   // ✅ Fetch products from backend
   useEffect(() => {
-    fetch("https://cake-1h0p.onrender.com/api/products")
+    fetch(`${API_BASE_URL}/api/products`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error("Error fetching products:", err));

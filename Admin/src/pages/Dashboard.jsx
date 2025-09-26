@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Line, Doughnut } from 'react-chartjs-2';
 import 'chart.js/auto';
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
@@ -14,8 +15,8 @@ export default function Dashboard() {
 
         // ✅ Fetch products & orders directly from backend (MongoDB)
         const [productsRes, ordersRes] = await Promise.all([
-          fetch('https://cake-1h0p.onrender.com/api/products'),
-          fetch('https://cake-1h0p.onrender.com/api/orders')
+          fetch(`${API_BASE_URL}/api/products`),
+          fetch(`${API_BASE_URL}/api/orders`)
         ]);
 
         const products = await productsRes.json();

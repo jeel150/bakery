@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import images from '../../../src/data/images';
 import '../../../src/styles/Login.css'
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 const { jarsImg } = images;
 
@@ -35,7 +36,7 @@ const AdminLogin = () => {
       };
 
       const body = JSON.stringify({ email, password });
-      const res = await axios.post("https://cake-1h0p.onrender.com/api/auth/admin/login", body, config);
+      const res = await axios.post(`${API_BASE_URL}/api/auth/admin/login`, body, config);
       
       // Check if user has admin role OR co-admin access
       if (res.data.user.role === "admin" || res.data.user.isCoAdmin) {

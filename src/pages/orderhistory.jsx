@@ -1,6 +1,7 @@
 import "../styles/orderhistory.css";
 import OrderDetails from "../pages/orderdetails"; 
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from '../config/api.js';
 
 const OrderHistory = ({ onClose, onOrderSelect }) => {
   const [orders, setOrders] = useState([]);
@@ -9,7 +10,7 @@ const OrderHistory = ({ onClose, onOrderSelect }) => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("https://cake-1h0p.onrender.com/api/orders");
+        const response = await fetch(`${API_BASE_URL}/api/orders`);
         const data = await response.json();
         setOrders(data);
       } catch (error) {

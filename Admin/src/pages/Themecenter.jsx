@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/global.css';
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 const ThemeCenter = () => {
   const [currentTheme, setCurrentTheme] = useState('default');
@@ -48,7 +49,7 @@ const ThemeCenter = () => {
   // Fetch current active theme from backend
   const fetchActiveTheme = async () => {
     try {
-      const response = await fetch('https://cake-1h0p.onrender.com/api/themes/active');
+      const response = await fetch(`${API_BASE_URL}/api/themes/active`);
       if (!response.ok) {
         setLoading(false);
         return;
@@ -92,7 +93,7 @@ const ThemeCenter = () => {
     try {
       if (theme.id === 0) {
         // Reset to none → clear backend active theme
-        await fetch('https://cake-1h0p.onrender.com/api/themes/reset', {
+        await fetch(`${API_BASE_URL}/api/themes/reset`, {
           method: 'PATCH'
         });
 
@@ -102,7 +103,7 @@ const ThemeCenter = () => {
         return;
       }
 
-      const response = await fetch('https://cake-1h0p.onrender.com/api/themes', {
+      const response = await fetch(`${API_BASE_URL}/api/themes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(theme),

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import '../styles/invoice.css';
 import { useParams } from "react-router-dom";
+import { API_BASE_URL } from '../config/api.js';
 
 const Invoice = () => {
   const { orderId } = useParams();
@@ -12,7 +13,7 @@ const Invoice = () => {
     const fetchOrderDetails = async () => {
       try {
         // Try to fetch order data from your API
-      const response = await fetch(`https://cake-1h0p.onrender.com/api/orders/${orderId}`);
+      const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
 
         
         if (!response.ok) {

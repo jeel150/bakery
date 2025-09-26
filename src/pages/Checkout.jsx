@@ -5,6 +5,7 @@ import '../styles/central.css';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { useCart } from '../components/CartContext.jsx';
+import { API_BASE_URL } from '../config/api.js';
 
 /** ---------------- Fake Stripe Modal ---------------- */
 function FakeStripeModal({ amount, onCancel, onSuccess }) {
@@ -128,7 +129,7 @@ export default function Checkout() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productsRes = await fetch('https://cake-1h0p.onrender.com/api/products');
+        const productsRes = await fetch(`${API_BASE_URL}/api/products`);
         const productsData = await productsRes.json();
         setAllProducts(productsData);
       } catch (err) {
@@ -272,7 +273,7 @@ export default function Checkout() {
 
   /** ---------------- Create order on server ---------------- */
   const createOrderOnServer = async (payload) => {
-    const res = await fetch('https://cake-1h0p.onrender.com/api/orders', {
+    const res = await fetch(`${API_BASE_URL}/api/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

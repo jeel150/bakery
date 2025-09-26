@@ -1,7 +1,7 @@
 // pages/CoAdminManagement.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { API_BASE_URL } from '../../../src/config/api.js';
 const CoAdminManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,7 +15,7 @@ const CoAdminManagement = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await axios.get('https://cake-1h0p.onrender.com/api/users', {
+      const response = await axios.get(`${API_BASE_URL}/api/users`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -33,7 +33,7 @@ const CoAdminManagement = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.patch(
-        `https://cake-1h0p.onrender.com/api/users/${userId}/toggle-coadmin`,
+        `${API_BASE_URL}/api/users/${userId}/toggle-coadmin`,
         { isCoAdmin: !currentStatus },
         {
           headers: {

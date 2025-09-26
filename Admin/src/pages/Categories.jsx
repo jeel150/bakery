@@ -5,6 +5,7 @@ import {
   TableRow, Paper, IconButton, Typography, Snackbar, Alert
 } from "@mui/material";
 import { Add, Edit, Delete } from "@mui/icons-material";
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
@@ -13,7 +14,7 @@ export default function Categories() {
   const [form, setForm] = useState({ name: "" });
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
-  const API_BASE = "https://cake-1h0p.onrender.com/api/categories";
+  const API_BASE = `${API_BASE_URL}/api/categories`;
 
   // ✅ Fetch Categories
   const fetchCategories = async () => {

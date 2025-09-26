@@ -1,6 +1,8 @@
 // orderdetails.jsx
 import "../styles/orderdetails.css";
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from '../config/api.js';
+
 
 const OrderDetails = ({ order, onClose, onBack, onGenerateInvoice }) => {
   const [orderData, setOrderData] = useState(order || null);
@@ -15,7 +17,7 @@ const OrderDetails = ({ order, onClose, onBack, onGenerateInvoice }) => {
       }
 
       try {
-        const response = await fetch(`https://cake-1h0p.onrender.com/api/orders/${order}`);
+        const response = await fetch(`${API_BASE_URL}/api/orders/${order}`);
         const data = await response.json();
         setOrderData(data);
       } catch (error) {

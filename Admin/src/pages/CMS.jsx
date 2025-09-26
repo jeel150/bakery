@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import DataTable from "../components/DataTable.jsx"
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 export default function CMS() {
   const [rows, setRows] = useState([])
@@ -46,7 +47,7 @@ export default function CMS() {
     if (!window.confirm("⚠️ This will permanently delete the file from your project. Continue?")) return
 
     try {
-      const res = await fetch(`https://cake-1h0p.onrender.com/api/pages/${filename}`, { method: "DELETE" })
+      const res = await fetch(`${API_BASE_URL}/api/pages/${filename}`, { method: "DELETE" })
       const data = await res.json()
 
       if (data.success) {

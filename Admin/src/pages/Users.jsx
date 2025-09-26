@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 function Users() {
   const [users, setUsers] = useState([]);
@@ -9,7 +10,7 @@ function Users() {
   // ✅ Fetch all users
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("https://cake-1h0p.onrender.com/api/users");
+      const res = await axios.get(`${API_BASE_URL}/api/users`);
       setUsers(res.data);
     } catch (err) {
       console.error("Error fetching users", err);
@@ -25,7 +26,7 @@ function Users() {
   // ✅ Add user
   const addUser = async () => {
     try {
-      await axios.post("https://cake-1h0p.onrender.com/api/users", {
+      await axios.post(`${API_BASE_URL}/api/users`, {
         ...newUser,
         status: "active", // default
       });
@@ -39,7 +40,7 @@ function Users() {
   // ✅ Toggle block/unblock
   const toggleUser = async (id) => {
     try {
-      await axios.patch(`https://cake-1h0p.onrender.com/api/users/${id}/toggle`);
+      await axios.patch(`${API_BASE_URL}/api/users/${id}/toggle`);
       fetchUsers();
     } catch (err) {
       console.error("Error toggling user", err);

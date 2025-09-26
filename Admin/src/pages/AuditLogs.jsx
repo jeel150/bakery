@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 export default function AuditLogs(){
   const [logs, setLogs] = useState([]);
   const [logins, setLogins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     const fetchAuditData = async () => {
@@ -12,7 +14,7 @@ export default function AuditLogs(){
         setLoading(true);
         
         // Fetch users data
-        const response = await fetch('https://cake-1h0p.onrender.com/api/users');
+        const response = await fetch(`${API_BASE_URL}/api/users`);
         const users = await response.json();
 
         if (!response.ok) {

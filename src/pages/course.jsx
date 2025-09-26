@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../styles/course.css';
-
+import { API_BASE_URL } from '../config/api.js';
 const Course = () => {
   const navigate = useNavigate();
 
@@ -14,7 +14,7 @@ const Course = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch('https://cake-1h0p.onrender.com/api/courses');
+        const res = await fetch(`${API_BASE_URL}/api/courses`);
         const data = await res.json();
         if (Array.isArray(data)) {
           setCourses(data);

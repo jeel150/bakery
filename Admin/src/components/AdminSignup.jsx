@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import images from '../../../src/data/images';
 import '../../../src/styles/SignUp.css'
+import { API_BASE_URL } from '../../../src/config/api.js';
+
 const { jarsImg } = images;
 
 const AdminSignup = () => {
@@ -43,7 +45,7 @@ const AdminSignup = () => {
       };
 
       const body = JSON.stringify({ name, email, phone, password });
-      const res = await axios.post("https://cake-1h0p.onrender.com/api/auth/admin/register",body, config);
+      const res = await axios.post(`${API_BASE_URL}/api/auth/admin/register`,body, config);
       
       setSuccess(res.data.message || "Admin registration successful!");
 

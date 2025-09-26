@@ -7,6 +7,8 @@ import {
 } from '@mui/material';
 import { Add, Edit, Delete, CloudUpload, Inventory, AttachMoney, Scale } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { API_BASE_URL } from '../../../src/config/api.js';
+
 
 // Styled components
 const VisuallyHiddenInput = styled('input')({
@@ -72,8 +74,8 @@ export default function Products() {
     eggType: 'egg',
   });
 
-  const API_BASE = "https://cake-1h0p.onrender.com/api/products";
-  const CATEGORY_API = "https://cake-1h0p.onrender.com/api/categories";
+  const API_BASE = `${API_BASE_URL}/api/products`;
+  const CATEGORY_API = `${API_BASE_URL}/api/categories`;
 
   const weightOptions = ['500g', '1kg', '2kg', '5kg', 'custom'];
 
@@ -215,7 +217,7 @@ const handleImageUpload = async (e) => {
     const formData = new FormData();
     formData.append("image", file);
 
-    const res = await fetch("https://cake-1h0p.onrender.com/api/upload", {
+    const res = await fetch(`${API_BASE_URL}/api/upload`, {
       method: "POST",
       body: formData,
     });

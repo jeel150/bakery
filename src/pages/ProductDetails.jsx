@@ -26,7 +26,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`https://cake-1h0p.onrender.com/api/products/${id}`);
+        const res = await fetch(`${API_BASE_URL}/api/products/${id}`);
         const data = await res.json();
         setProduct(data);
       } catch (err) {
@@ -42,7 +42,7 @@ function ProductDetails() {
   useEffect(() => {
     const fetchExplore = async () => {
       try {
-        const res = await fetch('https://cake-1h0p.onrender.com/api/products');
+        const res = await fetch(`${API_BASE_URL}/api/products`);
         const data = await res.json();
         const filtered = data.filter((p) => p._id !== id);
         setExplore(filtered);

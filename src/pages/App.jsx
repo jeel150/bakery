@@ -6,6 +6,7 @@ const { cakeBg, ladyImg, statementSetImg, jarsImg } = images;
 import { useNavigate } from 'react-router-dom';
 import { useCart } from "../components/CartContext";
 import '../styles/Base.css';
+import { API_BASE_URL } from '../config/api.js';
 
 function App() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const [sweetStoryCategories, setSweetStoryCategories] = useState([]);
 useEffect(() => {
   const fetchCategories = async () => {
     try {
-      const { data } = await axios.get("https://cake-1h0p.onrender.com/api/categories");
+      const { data } = await axios.get(`${API_BASE_URL}/api/categories`);
       setCategories(data);
 
 // filter by section
@@ -65,7 +66,7 @@ const [products, setProducts] = useState([]);
 useEffect(() => {
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get("https://cake-1h0p.onrender.com/api/products"); 
+      const { data } = await axios.get(`${API_BASE_URL}/api/products`); 
       setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);

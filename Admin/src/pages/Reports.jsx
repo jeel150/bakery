@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
+import { API_BASE_URL } from '../../../src/config/api.js';
 
 export default function Reports() {
   const [loading, setLoading] = useState(true);
@@ -15,8 +16,8 @@ export default function Reports() {
         
         // Fetch orders and products data
         const [ordersResponse, productsResponse] = await Promise.all([
-          fetch('https://cake-1h0p.onrender.com/api/orders'),
-          fetch('https://cake-1h0p.onrender.com/api/products')
+          fetch(`${API_BASE_URL}/api/orders`),
+          fetch(`${API_BASE_URL}/api/products`)
         ]);
         
         const orders = await ordersResponse.json();
