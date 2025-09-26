@@ -8,11 +8,11 @@ export const getApiBaseUrl = () => {
   // Check for render URL
   if (window.location.hostname.includes('vercel.app') || 
       window.location.hostname.includes('render.com')) {
-    return 'https://cake-1h0p.onrender.com';
+    return 'https://bakery-x0g5.onrender.com';
   }
   
   // Default to render for production
-  return 'https://cake-1h0p.onrender.com';
+  return 'hhttps://bakery-x0g5.onrender.com';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
