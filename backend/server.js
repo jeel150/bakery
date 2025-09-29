@@ -20,30 +20,35 @@ connectDB();
 
 const app = express();
 
-// Enhanced CORS configuration - ADD THIS
+// Enhanced CORS configuration
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:5174",
+  "http://localhost:5174", 
+  "https://bakery-lime-eight.vercel.app",
+  "https://bakery-x0g5.onrender.com",
   process.env.FRONTEND_URL,
-   process.env.FRONTEND_URL_PROD,
+  process.env.FRONTEND_URL_PROD,
   process.env.ADMIN_FRONTEND_URL
 ].filter(Boolean);
 
 
-
-// Configure CORS middleware
+// CORS middleware
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('CORS blocked for origin:', origin);
+      console.log('🚫 CORS blocked for origin:', origin);
+      console.log('✅ Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
+
+  
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -51,6 +56,11 @@ app.use(cors({
 
 // Handle preflight requests
 // app.options('*', cors()); 
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log(`📍 ${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+  next();
+});
 
 app.use(express.json());
 
