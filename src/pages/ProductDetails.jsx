@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import '../styles/central.css';
 import { useCart } from '../components/CartContext.jsx';
-
+import { API_BASE_URL } from '../config/api.js'; 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
