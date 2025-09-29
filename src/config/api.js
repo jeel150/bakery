@@ -12,7 +12,7 @@ export const getApiBaseUrl = () => {
   }
   
   // Default to render for production
-  return 'hhttps://bakery-x0g5.onrender.com';
+  return 'https://bakery-x0g5.onrender.com';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
