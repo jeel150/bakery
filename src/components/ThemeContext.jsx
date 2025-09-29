@@ -2,8 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 // Create context
 const ThemeContext = createContext();
+import { API_BASE_URL } from '../config/api';
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => useContext(ThemeContext); 
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(null);
@@ -16,7 +17,7 @@ export const ThemeProvider = ({ children }) => {
   // Fetch active theme from backend
   const fetchActiveTheme = async () => {
     try {
-      const response = await fetch("https://cake-1h0p.onrender.com/api/themes/active");
+     const response = await fetch(`${API_BASE_URL}/api/themes/active`);
       if (!response.ok) {
         setLoading(false);
         return;

@@ -25,8 +25,11 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   process.env.FRONTEND_URL,
+   process.env.FRONTEND_URL_PROD,
   process.env.ADMIN_FRONTEND_URL
 ].filter(Boolean);
+
+
 
 // Configure CORS middleware
 app.use(cors({
@@ -46,8 +49,8 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-
-// app.options('*', cors());
+// Handle preflight requests
+// app.options('*', cors()); 
 
 app.use(express.json());
 
