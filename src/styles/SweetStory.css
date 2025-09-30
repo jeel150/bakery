@@ -233,7 +233,7 @@
 /* Large Desktop (1400px and above) */
 @media (min-width:2560px) {
   .sweet-story-section {
-    top: 1090px !important;
+    top: 1700px !important;
     left: 80px;
     width: calc(100vw - 160px);
     max-width: none;
@@ -247,15 +247,16 @@
   }
   
   .sweet-story-tabs {
-     gap: 74px;
+    gap: 74px;
     margin-bottom: 30px;
     
   }
   
   .sweet-tab {
-      font-size: 34px;
-    padding: 6px 30px;
-    height: 52px;
+     font-size: 34px !important;
+    padding: 2px 30px 30px 30px !important;
+    height: 52px !important;
+    white-space: nowrap !important;
 
   }
   

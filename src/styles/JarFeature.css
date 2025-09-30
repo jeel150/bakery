@@ -93,28 +93,104 @@
 .jar-feature-btn:hover {
   background: #eecad6;
 }
-@media (min-width:2560px)
-{
-  .jar-feature-section {
-    top: 100px !important;
-    left: 80px;
-    width: 1020px !important;
-  }
-
-  .jar-feature-img {
-    width: 997px !important;
-    height: 565px;
-    margin-left: 500px !important;
-  }
-
-  .jar-feature-content {
-    width: 833px !important;
-    height: 461px;
-    margin-left: -80px !important;
-    margin-top: 70px;
-  }
-  
+@media (min-width:2560px){
+ 
+.jar-feature-section {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: 48px 0 0 0;
+  padding: 0;
+  width: 100%;
+  min-height: 565px;
+  background: none;
+  max-width: none;
 }
+
+.jar-feature-img {
+  width: 1097px !important;
+  height: 565px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.06);
+  margin-right: 24px;
+  margin-left: 300px;
+  opacity: 1;
+}
+
+.jar-feature-content {
+  width:850px !important;
+  height: 461px;
+  background: #f3f3f3bc;
+  border-radius: 8px;
+  backdrop-filter: blur(7px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 48px 48px 48px 48px;
+  box-sizing: border-box;
+  opacity: 1;
+  margin-left: -80px;
+  margin-top:50px;
+  z-index: 2;
+}
+
+.jar-feature-title {
+  width:850px;
+  height: 58px;
+  font-family:'Bricolage Grotesque', sans-serif;
+  font-weight: 50;
+  font-size: 60px;
+  line-height: 100%;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: #B89B5E;
+  margin-bottom: 16px;
+  opacity: 1;
+}
+
+.jar-feature-desc {
+  width: 600px;
+  height: 77px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 174%;
+  letter-spacing: 0;
+  color: #2A110A;
+  margin-bottom: 48px;
+  opacity: 1;
+}
+
+.jar-feature-btn {
+  width: 190px;
+  height: 62px;
+  border-radius: 4px;
+  background: #F6DBE0;
+  color: #441E14;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.02);
+  transition: background 0.2s;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.jar-feature-btn:hover {
+  background: #eecad6;
+}
+}
+
 @media (min-width: 1024px) and (max-width: 1279px)
 {
   .jar-feature-section {

@@ -141,7 +141,7 @@
 /* Large Desktop (2560px and above) */
 @media (min-width:2560px) {
   .justin-section {
-    top: 750px !important;
+    top: 1300px !important;
     left: -180px !important;
     width: 100vw;
     height: 320px;
@@ -641,6 +641,11 @@
     padding: 4px 10px;
     border-radius: 16px;
   }
+   .justin-weight{
+    font-size: 10px;
+    font-weight: 400;
+  }
+  
   
 }
 
@@ -753,6 +758,10 @@
     font-size: 9px;
     padding: 3px 8px;
     border-radius: 14px;
+  }
+  .justin-weight{
+    font-size: 9px;
+    font-weight: 400;
   }
   
   .justin-arrow {
@@ -978,12 +987,16 @@
   
   .justin-cart {
     font-size: 8px;
-    padding: 3px 7px;
+    padding: 4px 3px;
     border-radius: 12px;
   }
   
   .justin-arrow {
     font-size: 8px;
+  }
+  .justin-weight{
+    font-size: 8px;
+    font-weight: 400;
   }
 }
 

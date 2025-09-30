@@ -1117,7 +1117,7 @@
 
   /* Order Note */
   .product-order-note-label {
-    width: 190px;
+    width: 290px;
     height: 23px;
     font-size: 20px;
     top:92% !important;
@@ -1129,7 +1129,7 @@
     min-height: 100px;
     padding: 16px 20px;
     font-size: 18px;
-    top:94% !important;
+    top:95% !important;
     left: 50% !important;
   }
 
@@ -1156,6 +1156,14 @@
     top: 1750px !important;
     left:50% !important;
   }
+  .explore-section {
+  width: 100vw;
+  margin-top:700px;
+  margin-bottom: 32px;
+  padding-left: 51px;
+  padding-right: 51px;
+  max-width: none;
+}
 }
 
 

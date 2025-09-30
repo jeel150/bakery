@@ -218,7 +218,7 @@
 /* Large Desktop (1400px and above) */
 @media (min-width:2560px) {
   .imagination-section {
-    top: 1850px !important;
+    top: 2500px !important;
     left: 90px;
     width: 720px;
   }
@@ -246,7 +246,7 @@
   }
   
   .imagination-image-wrapper {
-    top: 1850px !important;
+    top: 2500px !important;
     left: 950px !important; /* Shift 20px left from original 540px */
     width: 550px;
     height: 670px;
@@ -264,7 +264,7 @@
   }
   
   .imagination-features-wrapper {
-    top: 1850px !important;
+    top: 2500px !important;
     left: 1600px !important; /* Shift 20px left from original 1080px */
     width: 750px;
     gap: 32px;
@@ -797,20 +797,20 @@
 /* Force override for iPhone XR Imagination */
 @media (min-width: 412px) and (max-width: 480px) {
   body .imagination-section {
-    top: 1300px !important;
+    top: 1450px !important;
   }
   
   body .imagination-image-wrapper {
-    top: 1530px !important;
+    top: 1670px !important;
   }
   
   body .imagination-features-wrapper {
-    top: 1960px !important;
+    top: 2100px !important;
   }
 }
 @media (min-width: 390px) and (max-width: 410px) {
   .imagination-section {
-    top: 1200px;
+    top: 1380px;
     left: 15px;
     width: calc(100vw - 30px);
     max-width: 280px;
@@ -836,7 +836,7 @@
   }
   
   .imagination-image-wrapper {
-    top: 1430px;
+    top: 1600px;
     left: 50%;
     transform: translateX(-50%);
     width: 280px;
@@ -856,7 +856,7 @@
   }
   
   .imagination-features-wrapper {
-    top: 1850px;
+    top:2060px;
     left: 10px;
     width: calc(100vw - 30px);
     max-width: 350px;
@@ -888,8 +888,8 @@
 /* Medium Mobile (375px - 480px) */
 @media (min-width: 375px) and (max-width: 389px) {
   .imagination-section {
-    top: 1150px;
-    left: 15px;
+    top: 1230px;
+    left: 19px;
     width: calc(100vw - 30px);
     max-width: 280px;
   }
@@ -914,7 +914,7 @@
   }
   
   .imagination-image-wrapper {
-    top: 1360px;
+    top: 1450px;
     left: 50%;
     transform: translateX(-50%);
     width: 280px;
@@ -933,7 +933,7 @@
   }
   
   .imagination-features-wrapper {
-    top: 1790px;
+    top: 1860px;
     left: 10px;
     width: calc(100vw - 30px);
     max-width: 350px;
@@ -962,7 +962,7 @@
 }
 
 /* Small Mobile (320px - 374px) */
-@media (min-width: 340px) and (max-width: 374px) {
+@media (min-width: 340px) and (max-width: 359px) {
   .imagination-section {
     top: 1100px !important;
     left: 10px;
@@ -1191,8 +1191,8 @@
 /* 360px Specific Responsive Design */
 @media (max-width: 360px) {
   .imagination-section {
-    top: 1140px;
-    left: 12px;
+    top: 1210px;
+    left: 20px;
     width: calc(100vw - 24px);
     max-width: 240px;
   }
@@ -1217,7 +1217,7 @@
   }
   
   .imagination-image-wrapper {
-    top: 1750px;
+    top: 1400px;
     left: 50%;
     transform: translateX(-50%);
     width: 240px;
@@ -1236,8 +1236,8 @@
   }
   
   .imagination-features-wrapper {
-    top: 1300px;
-    left: 12px;
+    top: 1750px;
+    left: 22px;
     width: calc(100vw - 24px);
     max-width: 280px;
     gap: 14px;

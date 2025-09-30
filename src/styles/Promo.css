@@ -425,7 +425,7 @@
 @media (max-width: 480px) {
   .promo-wrapper {
     position: relative !important;
-    top: 3050px !important;
+    top: 3250px !important;
     left: 20px !important;
     right: 20px !important;
     width: calc(100vw - 40px) !important;
@@ -529,7 +529,7 @@
 @media (max-width: 360px) {
   .promo-wrapper {
     position: relative !important;
-    top: 3020px !important;
+    top: 3220px !important;
     left: 15px !important;
     width: calc(100% - 15px) !important;
     height: 220px !important;

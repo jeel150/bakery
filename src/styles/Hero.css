@@ -99,7 +99,7 @@
 /* ===== RESPONSIVE DESIGN ===== */
 @media (min-width: 2560px) {
   .hero-rb {
-    top: 240px !important;
+    top: 340px !important;
     left: -50px !important;
     width: 700px !important;
     height: 350px;
@@ -200,7 +200,7 @@
 /* Medium Mobile (375px - 480px) */
 @media (min-width: 375px) and (max-width: 480px) {
   .hero-rb {
-    top: 120px;
+    top: 130px;
     left: 15px;
     width: calc(100vw - 30px);
     height: auto;
