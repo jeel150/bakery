@@ -254,9 +254,10 @@ font-family: 'Bricolage Grotesque', Arial, sans-serif;
   }
 
   .occasions-tab {
-    font-size: 34px;
-    padding: 6px 30px;
-    height: 52px;
+     font-size: 34px !important;
+    padding: 2px 18px 18px 18px !important;
+    height: 55px !important;
+    white-space: nowrap !important;
 
   }
 
@@ -323,7 +324,7 @@ font-family: 'Bricolage Grotesque', Arial, sans-serif;
     width: 62px !important;
     height: 62px !important;
     top: 380px !important;
-    left: 430px !important;
+    left: 235px !important;
   }
 
   .occasion-card-bag svg {
@@ -747,7 +748,7 @@ font-family: 'Bricolage Grotesque', Arial, sans-serif;
 /* Small Mobile Devices (max-width: 480px) */
 @media (max-width: 480px) {
   .occasions-section {
-    margin-top: 3200px !important;
+    margin-top: 3400px !important;
     padding-left: 20px !important;
     padding-right: 20px !important;
     width: calc(100vw - 40px) !important;
@@ -834,6 +835,11 @@ font-family: 'Bricolage Grotesque', Arial, sans-serif;
   .occasions-card-price {
     font-size: 13px !important;
   }
+   .occasions-card-weight{
+    font-size: 12px;
+    font-weight: 400;
+  }
+  
 
   /* Responsive styles for heart and bag symbols */
   .occasion-card-heart {

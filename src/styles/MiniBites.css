@@ -297,7 +297,7 @@ font-family: 'Bricolage Grotesque', Arial, sans-serif;
 
   .minibites-tab {
     font-size: 34px !important;
-    padding: 6px 30px !important;
+    padding: 2px 30px 30px 30px !important;
     height: 52px !important;
     white-space: nowrap !important;
   }
@@ -369,7 +369,7 @@ font-family: 'Bricolage Grotesque', Arial, sans-serif;
    width: 62px !important;
     height: 62px !important;
     top: 380px !important;
-    left: 430px !important;
+    left: 240px !important;
 }
 
 .minibites-card-bag svg {
@@ -754,6 +754,10 @@ font-family: 'Bricolage Grotesque', Arial, sans-serif;
 
   .minibites-section .minibites-card-title {
     font-size: 11px !important;
+  }
+  .minibites-section .minibites-card-weight{
+    font-size: 12px;
+    font-weight: 400;
   }
 
   .minibites-section .minibites-card-price {

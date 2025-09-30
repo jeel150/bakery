@@ -1496,20 +1496,19 @@ cake-sidebar-plus {
   }
   
   .cake-card-title {
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
+    font-size: 1.5rem;
   }
   
   .cake-card-price {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
   }
   
   .cake-card-bag {
     width: 4rem;
     width: 62px !important;
     height: 62px !important;
-    top: -20px !important;
-    left: 300px !important;
+    top: -50px !important;
+    left: 350px !important;
   }
   
   .cake-card-bag svg {
