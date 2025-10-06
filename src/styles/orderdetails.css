@@ -62,7 +62,7 @@ border: 1px solid #ECECEC
 .order-title{
 width: 384px;
 height: 39px;
-left: 528px;
+left:370px;
 opacity: 1;
 font-family: Saxo Grammaticus;
 font-weight: 400;
@@ -78,7 +78,7 @@ position:relative;
 .order-subtitle{
 width: 316px;
 height: 26px;
-top:15px;
+top:25px;
 left: 555px;
 opacity: 1;
 font-family: Bricolage Grotesque;
@@ -393,7 +393,7 @@ color: #FFFFFF;
 .invoice-btn{
    width: 150px;
   height: 40px;
-  bottom: 1304px;
+  bottom: 1318px;
   left: 51.5%;
   opacity: 1;
   background: #ecf2fd;

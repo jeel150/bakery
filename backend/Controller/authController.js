@@ -49,6 +49,45 @@ export const registerUser = async (req, res) => {
 };
 
 // Login User (same for user/admin)
+// export const loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const user = await User.findOne({ email });
+//     if (!user) return res.status(400).json({ message: "Invalid email or password" });
+
+//     if (user.status === "blocked") {
+//       return res.status(403).json({ message: "Your account has been blocked. Please contact support." });
+//     }
+
+//     const isMatch = await user.matchPassword(password);
+//     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
+
+//       const hasAdminAccess = user.role === "admin" || user.isCoAdmin;
+
+//          if (!hasAdminAccess) {
+//       return res.status(403).json({ 
+//         message: "You don't have admin access. Please contact administrator." 
+//       });
+//     }
+
+//     res.json({
+//       token: generateToken(user._id),
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         phone: user.phone,
+//         role: user.role,
+//          isCoAdmin: user.isCoAdmin 
+//       },
+//       message: "Login successful!"
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+// authController.js - Updated loginUser function
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -63,12 +102,24 @@ export const loginUser = async (req, res) => {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
+    // Check if this is an admin login attempt
+    const isAdminLoginEndpoint = req.originalUrl.includes('/admin/login');
+    
+    if (isAdminLoginEndpoint) {
+      // For admin login, require admin role or co-admin access
       const hasAdminAccess = user.role === "admin" || user.isCoAdmin;
-
-         if (!hasAdminAccess) {
-      return res.status(403).json({ 
-        message: "You don't have admin access. Please contact administrator." 
-      });
+      if (!hasAdminAccess) {
+        return res.status(403).json({ 
+          message: "You don't have admin access. Please contact administrator." 
+        });
+      }
+    } else {
+      // For regular user login, allow any role but show appropriate message
+      if (user.role === "admin" || user.isCoAdmin) {
+        return res.status(403).json({ 
+          message: "Admin users should login through admin portal." 
+        });
+      }
     }
 
     res.json({
@@ -79,7 +130,7 @@ export const loginUser = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
-         isCoAdmin: user.isCoAdmin 
+        isCoAdmin: user.isCoAdmin 
       },
       message: "Login successful!"
     });

@@ -141,7 +141,7 @@
 /* Large Desktop (2560px and above) */
 @media (min-width:2560px) {
   .justin-section {
-    top: 1300px !important;
+    top:1300px !important;
     left: -180px !important;
     width: 100vw;
     height: 320px;
@@ -188,6 +188,54 @@
   }
 }
 
+@media (min-width: 2560px) and (max-height: 1140px) {
+   .justin-section {
+    top:850px !important;
+    left: -180px !important;
+    width: 100vw;
+    height: 320px;
+    max-width: none;
+    overflow: hidden;
+  }
+  
+  .justin-title {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+  
+  .justin-scroll {
+    gap: 28px;
+  }
+  
+  .justin-card {
+    width: 500px;
+    height: 180px;
+    padding: 12px 18px;
+    gap: 16px;
+  }
+  
+  .justin-img {
+    width: 120px;
+    height: 150px;
+  }
+  
+  .justin-flavor {
+    font-size: 18px;
+  }
+  
+  .justin-name {
+    font-size: 18px;
+  }
+  
+  .justin-price {
+    font-size: 18px;
+  }
+  
+  .justin-cart {
+    font-size: 18px;
+    padding: 8px 18px;
+  }
+}
 /* For 2560px width screens only */
 /* @media (min-width: 2560px) {
   .justin-section {
@@ -256,6 +304,25 @@
   }
 }
 } */
+
+@media (min-width:1990px) and (max-width: 2559px)  {
+ .justin-section {
+    top: 580px;
+    left: 60px;
+    width: calc(100vw - 120px);
+    height: 310px;
+ }
+}
+
+  /* @media (min-width:1400px) and (max-width:1950px)  {
+    .justin-section {
+    top: 400px;
+    left: 60px;
+    width: calc(100vw - 70px);
+    height: 180px;
+ }
+} */
+
 
 /* Desktop (1200px - 1399px) */
 @media (min-width: 1280px) and (max-width: 1399px) {
