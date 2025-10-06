@@ -23,6 +23,8 @@ import Invoice from './pages/invoice.jsx';
 import OrderHistory from './pages/orderhistory.jsx';
 import OrderDetails from './pages/orderdetails.jsx';
 import { ThemeProvider } from "./components/ThemeContext.jsx";
+import PrivateRoute from '../src/components/PrivateRoute.jsx';
+import PublicRoute from '../src/components/PublicRoute.jsx';
 
 
 function MainProvider() {
@@ -38,7 +40,7 @@ function MainProvider() {
         <CartSidebarContext.Provider value={{ openCart, closeCart }}>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<App />} />
+              <Route path="/" element={ <PrivateRoute><App /></PrivateRoute>} />
               <Route path="/cakes" element={<Cake />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/checkout" element={<Checkout />} />
@@ -47,13 +49,13 @@ function MainProvider() {
               <Route path="/celebrate" element={<Celebrate />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={ <PublicRoute> <Signup /> </PublicRoute> } />
+              <Route path="/login" element={ <PublicRoute> <Login /> </PublicRoute>} />
               <Route path="/returnpolicy" element={<ReturnPolicy />} />
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/orderhistory" element={<OrderHistory />} />
               <Route path="/orderdetails" element={<OrderDetails/>}/>
-           
+             <Route path="*" element={<Login />} />
             </Routes>
             <CartSidebar isOpen={isCartOpen} onClose={closeCart}/>
           </BrowserRouter>

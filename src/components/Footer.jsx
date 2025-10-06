@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Footer = ({ className = '', onSubscribe}) => {
+const Footer = ({ className = '', onSubscribe }) => {
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
   
@@ -42,6 +42,21 @@ const Footer = ({ className = '', onSubscribe}) => {
     }
   };
 
+  // Scroll to section function (same as in App.jsx)
+  const scrollToSection = (section) => {
+    // This function would need to be passed as a prop from parent component
+    // or use a global state management solution
+    // For now, we'll navigate to main page and rely on the main app to handle scrolling
+    navigate('/');
+    // The actual scrolling logic would be handled in App.jsx
+  };
+
+  // Set category and scroll function (would need to be passed as props)
+  const handleShopNowClick = (category, section) => {
+    navigate('/');
+    // The actual tab setting and scrolling would be handled in App.jsx
+  };
+
   return (
     <footer className={`rb-footer ${className}`}>
       <div className="rb-footer-top">
@@ -54,6 +69,33 @@ const Footer = ({ className = '', onSubscribe}) => {
               <circle cx="17" cy="7" r="1.2" fill="#441E14"/>
             </svg>
             Follow US
+          </button>
+          <button
+            className="rb-footer-google"
+            style={{
+              width: '188px',
+              height: '42px',
+              borderRadius: '50px',
+              background: '#F6DBE0',
+              border: 'none',
+              fontFamily: "'Bricolage Grotesque', sans-serif",
+              fontSize: '15px',
+              fontWeight: 500,
+              color: '#441E14',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+              padding: '0 16px',
+              margin: '4px 0',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            }}
+            aria-label="Review on Google"
+          >
+            <i className="fab fa-google" style={{ fontSize: '16px' }} />
+            Review on Google
           </button>
         </div>
         <div className="rb-footer-links">
@@ -69,14 +111,39 @@ const Footer = ({ className = '', onSubscribe}) => {
           <div className="rb-footer-col">
             <div className="rb-footer-col-title">Shop Now</div>
             <ul>
+              <li 
+                onClick={() => handleShopNowClick('Custom Cake', 'sweet-story')} 
+                style={{cursor: 'pointer'}}
+              >
+                Customized Cakes
+              </li>
+              <li 
+                onClick={() => handleShopNowClick('Masson jar Cake', 'sweet-story')} 
+                style={{cursor: 'pointer'}}
+              >
+                Mason Jar Cakes
+              </li>
+              <li 
+                onClick={() => handleShopNowClick('Cake slice', 'mini-bites')} 
+                style={{cursor: 'pointer'}}
+              >
+                Cake Slice
+              </li>
+              <li 
+                onClick={() => handleShopNowClick('Brownie', 'mini-bites')} 
+                style={{cursor: 'pointer'}}
+              >
+                Brownies
+              </li>
+              <li 
+                onClick={() => handleShopNowClick('Cup Cake', 'occasions')} 
+                style={{cursor: 'pointer'}}
+              >
+                Cup Cake
+              </li>
               <li>Ramadan</li>
               <li>Whole Cake</li>
-              <li>Customized Cakes</li> 
-              <li>Mason Jar Cakes</li>
               <li>Milk Cakes</li>
-              <li>Cake Slice</li>
-              <li>Brownies</li>
-              <li>Cupcakes</li>
               <li>Cheese Cakes</li>
               <li>Mousses & Desserts</li>
             </ul>
@@ -84,12 +151,11 @@ const Footer = ({ className = '', onSubscribe}) => {
           <div className="rb-footer-col">
             <div className="rb-footer-col-title">Help</div>
             <ul>
-              <li>Delivery / Shipment Policy</li>
-              <li>Returns & Exchange</li>
-              <li>Terms and Conditions</li>
-              <li>Privacy Policy</li>
-              <li>FAQ</li>
-              <li>Contact Us</li>
+              <li onClick={() => navigate('/returnpolicy')} style={{cursor: 'pointer'}}>Returns & Exchange</li>
+              <li onClick={() => navigate('/about')} style={{cursor: 'pointer'}}>Terms and Conditions</li>
+              <li onClick={() => navigate('/returnpolicy')} style={{cursor: 'pointer'}}>Privacy Policy</li>
+              <li onClick={() => navigate('/about')} style={{cursor: 'pointer'}}>FAQ</li>
+              <li onClick={() => navigate('/contact')} style={{cursor: 'pointer'}}>Contact Us</li>
             </ul>
           </div>
           <div className="rb-footer-col rb-footer-subscribe">

@@ -6,13 +6,14 @@ const { logo } = images;
 import OrderHistory from '../pages/orderhistory.jsx';
 import OrderDetails from '../pages/orderdetails.jsx';
 import Invoice from '../pages/invoice.jsx';
-import '../styles/orderhistory.css';  
+import '../styles/orderhistory.css';
 import '../styles/orderdetails.css';
 import '../styles/invoice.css';
-import { useTheme } from '../components/ThemeContext.jsx'; // Import the theme context
+import { useTheme } from '../components/ThemeContext.jsx';
 
-const Navbar = () => {
+const Navbar = ({ onSearch }) => {
   const [showSearch, setShowSearch] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [activeMenuItem, setActiveMenuItem] = useState('cakes');
   const [showToast, setShowToast] = useState(false);
@@ -21,20 +22,16 @@ const Navbar = () => {
   const [showInvoice, setShowInvoice] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const navigate = useNavigate();
-  
-  // Get theme from context
+
   const { theme } = useTheme();
 
-  // Apply theme styles to navbar
   useEffect(() => {
     if (theme?.colors) {
-      // Apply theme colors to navbar
       document.documentElement.style.setProperty('--navbar-primary', theme.colors.primary);
       document.documentElement.style.setProperty('--navbar-secondary', theme.colors.secondary);
       document.documentElement.style.setProperty('--navbar-accent', theme.colors.accent);
       document.documentElement.style.setProperty('--navbar-background', theme.colors.background);
     } else {
-      // Reset to default colors if no theme
       document.documentElement.style.removeProperty('--navbar-primary');
       document.documentElement.style.removeProperty('--navbar-secondary');
       document.documentElement.style.removeProperty('--navbar-accent');
@@ -43,22 +40,44 @@ const Navbar = () => {
   }, [theme]);
 
   const handleSearchClick = () => setShowSearch(true);
-  const handleCloseSearch = () => setShowSearch(false);
+  const handleCloseSearch = () => {
+    setShowSearch(false);
+    setSearchText("");
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      const q = searchText.trim();
+      if (!q) return;
+      if (onSearch) onSearch(q);
+      setShowSearch(false);
+      setSearchText("");
+    }
+  };
+
+  const handleSearchButtonSubmit = () => {
+    const q = searchText.trim();
+    if (!q) return;
+    if (onSearch) onSearch(q);
+    setShowSearch(false);
+    setSearchText("");
+  };
+
   const handleHeartClick = () => {
     setShowToast(true);
     setTimeout(() => {
       setShowToast(false);
     }, 3000);
   };
-  
+
   const handleBagClick = () => {
     setShowOrderHistory(true);
   };
-  
+
   const handleUserClick = () => {
     navigate('/contact');
   };
-  
+
   const toggleMobileMenu = () => {
     setShowMobileMenu(!showMobileMenu);
   };
@@ -66,29 +85,43 @@ const Navbar = () => {
   const handleMenuItemClick = (menuItem) => {
     setActiveMenuItem(menuItem);
     setShowMobileMenu(false);
-    
-    switch(menuItem) {
-      case 'cakes':
-    
-        break;
-      case 'jars':
-     
-        break;
-      case 'chefs':
-       
-        break;
-      case 'mini-bites':
-      
-        break;
-      case 'customized':
-      
-        break;
-      case 'corporate':
-       
-        break;
-      default:
-        break;
+
+    if (window.location.pathname !== '/') {
+      navigate('/');
     }
+
+    setTimeout(() => {
+      let sectionId = '';
+
+      switch (menuItem) {
+        case 'cakes':
+          sectionId = 'sweet-story-section';
+          break;
+        case 'jars':
+          sectionId = 'minibites-section';
+          break;
+        case 'chefs':
+          sectionId = 'sweet-story-section';
+          break;
+        case 'mini-bites':
+          sectionId = 'minibites-section';
+          break;
+        case 'customized':
+          sectionId = 'imagination-section';
+          break;
+        case 'corporate':
+          sectionId = 'occasions-section';
+          break;
+        default:
+          sectionId = 'sweet-story-section';
+          break;
+      }
+
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   const handleOrderSelect = (order) => {
@@ -104,7 +137,6 @@ const Navbar = () => {
   };
 
   const handleDownloadInvoice = (order) => {
-    // Implement download functionality here
     console.log('Downloading invoice for order:', order);
     alert('Invoice download functionality would be implemented here');
   };
@@ -150,7 +182,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Toast Notification */}
       {showToast && (
         <div className="toast-notification">
           <div className="toast-content">
@@ -162,44 +193,41 @@ const Navbar = () => {
             <span className="toast-message">Nothing is in favourite</span>
             <button className="toast-close" onClick={() => setShowToast(false)}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 4L4 12M4 4L12 12" stroke="#666" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M12 4L4 12M4 4L12 12" stroke="#666" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
             </button>
           </div>
         </div>
       )}
 
-      {/* Order History Slider */}
       {showOrderHistory && (
         <div className="order-history-slider">
           <div className="order-history-content">
-            <OrderHistory onClose={handleCloseOrderHistory} onOrderSelect={handleOrderSelect}/> 
+            <OrderHistory onClose={handleCloseOrderHistory} onOrderSelect={handleOrderSelect} />
           </div>
         </div>
       )}
 
-      {/* Order Details Slider */}
       {showOrderDetails && (
         <div className="order-details-slider">
           <div className="order-details-content">
-            <OrderDetails 
-              orderId={selectedOrderId} 
+            <OrderDetails
+              orderId={selectedOrderId}
               onClose={handleCloseOrderDetails}
               onGenerateInvoice={handleGenerateInvoice}
-            /> 
+            />
           </div>
         </div>
       )}
 
-      {/* Invoice Slider */}
       {showInvoice && (
         <div className="invoice-slider">
           <div className="invoice-content">
-            <Invoice 
+            <Invoice
               orderId={selectedOrderId}
               onClose={handleBackFromInvoice}
               onDownload={handleDownloadInvoice}
-            /> 
+            />
           </div>
         </div>
       )}
@@ -209,89 +237,95 @@ const Navbar = () => {
         {showSearch && (
           <div className="floating-searchbar-overlay" onClick={handleCloseSearch}>
             <div className="floating-searchbar" onClick={e => e.stopPropagation()}>
-              <input type="text" placeholder="Search cakes, desserts..." autoFocus />
-              <button className="close-searchbar" onClick={handleCloseSearch}>&times;</button>
+              <input
+                type="text"
+                placeholder="Search cakes, desserts..."
+                autoFocus
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+              />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button className="close-searchbar" onClick={handleCloseSearch}>&times;</button>
+                <button className="close-searchbar" onClick={handleSearchButtonSubmit} aria-label="Search">Search</button>
+              </div>
             </div>
           </div>
         )}
-        
-        {/* Left Symbol/Logo */}
+
         <div className="navbar-logo">
           <img src={logo} alt="Ribbons & Balloons" />
         </div>
-        
-        {/* Menu Items */}
+
         <ul className={`navbar-menu ${showMobileMenu ? 'mobile-active' : ''}`}>
-          <li 
-            className={`navbar-item cakes ${activeMenuItem === 'cakes' ? 'active' : ''}`} 
+          <li
+            className={`navbar-item cakes ${activeMenuItem === 'cakes' ? 'active' : ''}`}
             onClick={() => handleMenuItemClick('cakes')}
           >
             Cakes
           </li>
-          <li 
-            className={`navbar-item jars ${activeMenuItem === 'jars' ? 'active' : ''}`} 
+          <li
+            className={`navbar-item jars ${activeMenuItem === 'jars' ? 'active' : ''}`}
             onClick={() => handleMenuItemClick('jars')}
           >
             Jars
           </li>
-          <li 
-            className={`navbar-item chefs ${activeMenuItem === 'chefs' ? 'active' : ''}`} 
+          <li
+            className={`navbar-item chefs ${activeMenuItem === 'chefs' ? 'active' : ''}`}
             onClick={() => handleMenuItemClick('chefs')}
           >
             Chef's Special
           </li>
-          <li 
-            className={`navbar-item mini-bites ${activeMenuItem === 'mini-bites' ? 'active' : ''}`} 
+          <li
+            className={`navbar-item mini-bites ${activeMenuItem === 'mini-bites' ? 'active' : ''}`}
             onClick={() => handleMenuItemClick('mini-bites')}
           >
             Mini Bites
           </li>
-          <li 
-            className={`navbar-item customized ${activeMenuItem === 'customized' ? 'active' : ''}`} 
+          <li
+            className={`navbar-item customized ${activeMenuItem === 'customized' ? 'active' : ''}`}
             onClick={() => handleMenuItemClick('customized')}
           >
             Customized Cake
           </li>
-          <li 
-            className={`navbar-item corporate ${activeMenuItem === 'corporate' ? 'active' : ''}`} 
+          <li
+            className={`navbar-item corporate ${activeMenuItem === 'corporate' ? 'active' : ''}`}
             onClick={() => handleMenuItemClick('corporate')}
           >
             Corporate & events
           </li>
         </ul>
-        
-        {/* Right Side Icons */}
+
         <div className="navbar-icons">
-          {/* Mobile Menu Toggle */}
           <div className="mobile-menu-toggle" onClick={toggleMobileMenu}>
             {!showMobileMenu ? (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 12H21M3 6H21M3 18H21" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 12H21M3 6H21M3 18H21" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             ) : (
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 5L5 15M5 5L15 15" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" strokeLinecap="round"/>
+                <path d="M15 5L5 15M5 5L15 15" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" strokeLinecap="round" />
               </svg>
             )}
           </div>
-          <div className="icon-circle" onClick={handleSearchClick} style={{cursor: 'pointer'}}>
+          <div className="icon-circle" onClick={handleSearchClick} style={{ cursor: 'pointer' }}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="9" cy="9" r="7" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" />
               <line x1="14.2929" y1="14.7071" x2="18" y2="18.4142" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" />
             </svg>
           </div>
-          <div className="icon-circle" onClick={handleHeartClick} style={{cursor: 'pointer'}}>
+          <div className="icon-circle" onClick={handleHeartClick} style={{ cursor: 'pointer' }}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 17s-5-3.33-7-6.5C1 8 2.5 5 5.5 5c1.54 0 2.54 1 3.5 2 0.96-1 1.96-2 3.5-2C17.5 5 19 8 17 10.5c-2 3.17-7 6.5-7 6.5z" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" fill="none" />
             </svg>
           </div>
-          <div className="icon-circle" onClick={handleUserClick} style={{cursor: 'pointer'}}>
+          <div className="icon-circle" onClick={handleUserClick} style={{ cursor: 'pointer' }}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="10" cy="7" r="3" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" />
               <path d="M3 17c0-2.21 3.13-4 7-4s7 1.79 7 4" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" fill="none" />
             </svg>
           </div>
-          <div className="icon-circle" onClick={handleBagClick} style={{cursor: 'pointer'}}>
+          <div className="icon-circle" onClick={handleBagClick} style={{ cursor: 'pointer' }}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="4" y="7" width="12" height="9" rx="2" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" />
               <path d="M7 7V5a3 3 0 1 1 6 0v2" stroke="var(--navbar-primary, #2A110A)" strokeWidth="2" />

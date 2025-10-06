@@ -2,7 +2,7 @@
 
 .hero-rb {
   position: absolute;
-  top: 230px;
+  top: 200px;
   left: 53px;
   width: 413px;
   height: 250px;
@@ -99,30 +99,66 @@
 /* ===== RESPONSIVE DESIGN ===== */
 @media (min-width: 2560px) {
   .hero-rb {
-    top: 340px !important;
-    left: -50px !important;
+    top: 380px !important;
+    margin-left: 30px;
     width: 700px !important;
     height: 350px;
   }
   
   .hero-title {
-    width: 1500px !important;
+    width: 1800px !important;
     height: auto;
-    font-size: 80px !important;
+    font-size: 110px !important;
     margin-bottom: 30px !important;
+    margin-left: -10px;
   }
   
   .hero-desc {
     width: 900px !important;
     height: auto;
-    font-size: 30px !important;
+    font-size: 35px !important;
     margin-bottom: 40px !important;
   }
   
   .hero-btn {
     min-width: 500px !important;
     height: 80px !important;
-    font-size: 30px !important;
+    font-size: 40px !important;
+    padding: 0 30px;
+  }
+  
+  .hero-btn-arrow {
+    font-size: 40px !important;
+  }
+  
+}
+@media (min-width: 2560px) and (max-height: 1140px) {
+  .hero-rb {
+    top: 300px !important;
+    left: -50px !important;
+    width: 700px !important;
+    height: 350px;
+  }
+  
+  .hero-title {
+    width: 1800px !important;
+    height: auto;
+    font-size: 70px !important;
+    margin-bottom: 30px !important;
+    margin-left: -9px;
+  }
+  
+  .hero-desc {
+    width: 900px !important;
+    height: auto;
+    font-size: 35px !important;
+    margin-bottom: 40px !important;
+  }
+  
+  .hero-btn {
+    min-width: 500px !important;
+    height: 80px !important;
+    font-size: 40px !important;
     padding: 0 30px;
   }
   
@@ -133,18 +169,19 @@
 }
 
 /* Large Desktop (1400px and above) */
-@media (min-width: 1400px) {
+/* @media (min-width: 1400px)  and (max-width: 2559px) {
   .hero-rb {
-    top: 250px;
-    left: 80px;
-    width: 500px;
-    height: 280px;
+    top: 200px;
+    left: 90px;
+    width: 300px;
+    height: 100px;
+    
   }
   
   .hero-title {
     width: 500px;
     height: auto;
-    font-size: 48px;
+    font-size: 35px;
     margin-bottom: 15px;
   }
   
@@ -165,7 +202,7 @@
   .hero-btn-arrow {
     font-size: 20px;
   }
-}
+} */
 
 /* Desktop (1200px - 1399px) */
 @media (min-width: 1200px) and (max-width: 1399px) {
