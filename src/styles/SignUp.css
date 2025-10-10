@@ -192,6 +192,15 @@
     gap: 20px;
   }
 }
+.checkout-redirect-message {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+}
 
 /* Desktop styles (1024px and up) */
 @media (min-width: 1024px) {

@@ -142,9 +142,9 @@
 
 import '../styles/SignUp.css';
 import images from '../data/images';
-import { useState } from 'react';
+import { useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,useLocation  } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api.js'; // Import the config
 
 const { jarsImg } = images;
@@ -160,6 +160,7 @@ function Signup() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+    const location = useLocation();
 
   const { name, email, phone, password, passwordConfirm } = formData;
 
@@ -167,44 +168,54 @@ function Signup() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = async e => {
-    e.preventDefault();
-    
-    if (password !== passwordConfirm) {
-      setError('Passwords do not match');
-      return;
-    }
+ const onSubmit = async e => {
+  e.preventDefault();
+  
+  if (password !== passwordConfirm) {
+    setError('Passwords do not match');
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const config = {
-        headers: { 
-          'Content-Type': 'application/json' 
-        },
-        withCredentials: true
-      };
+  try {
+    setLoading(true);
+    const config = {
+      headers: { 
+        'Content-Type': 'application/json' 
+      },
+      withCredentials: true
+    };
 
-      const body = JSON.stringify({ name, email, phone, password });
-      
-      // Use the environment-aware API URL
-      const res = await axios.post(`${API_BASE_URL}/api/auth/register`, body, config);
+    const body = JSON.stringify({ name, email, phone, password });
+    const res = await axios.post(`${API_BASE_URL}/api/auth/register`, body, config);
 
-      // Save token
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+    // Save token
+    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
 
-      // Redirect to main app
-      if (res.data.user.role === "admin" || res.data.user.isCoAdmin) {
-        navigate('/products');
+    // Redirect based on role
+    if (res.data.user.role === "admin" || res.data.user.isCoAdmin) {
+      navigate('/products');
+    } else {
+      // For regular users, redirect to checkout if they came from there
+      const fromLocation = location.state?.from;
+      if (fromLocation === '/checkout') {
+        navigate('/checkout', { 
+          state: { 
+            cartItems: location.state?.cartItems || [],
+            message: 'Account created! You can now proceed with your order'
+          }
+        });
       } else {
         navigate('/');
       }
-    } catch (err) {
-      console.error('Signup error:', err);
-      setError(err.response?.data?.message || 'Registration failed');
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    console.error('Signup error:', err);
+    setError(err.response?.data?.message || 'Registration failed');
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="signup-background">
@@ -219,6 +230,14 @@ function Signup() {
           {/* Right form content */}
           <div className="signup-right-content">
             <h2 className="signup-title">SIGNUP</h2>
+
+           {/*Checkout redirect message*/}
+            {location.state?.from === '/checkout' && (
+              <div className="checkout-redirect-message">
+               🛒 Complete your order after signing up
+              </div>
+            )}
+
             {error && <div className="error-message">{error}</div>}
             <form className="signup-form" onSubmit={onSubmit}>
               <input 

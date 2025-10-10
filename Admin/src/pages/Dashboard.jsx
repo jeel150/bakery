@@ -8,125 +8,24 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-
-        // ✅ Fetch products & orders directly from backend (MongoDB)
-        const [productsRes, ordersRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/products`),
-          fetch(`${API_BASE_URL}/api/orders`)
-        ]);
-
-        const products = await productsRes.json();
-        const orders = await ordersRes.json();
-
-        if (!productsRes.ok || !ordersRes.ok) {
-          throw new Error('Failed to fetch dashboard data');
-        }
-
-        // Today's sales - include Completed and Delivered orders
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const salesToday = orders
-          .filter(order => new Date(order.createdAt) >= today && 
-                 (order.status === 'Delivered' || order.status === 'Completed'))
-          .reduce((sum, order) => sum + (order.total || 0), 0);
-
-        // Weekly sales (last 7 days) - include Completed and Delivered orders
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-        const weeklySales = orders
-          .filter(order => new Date(order.createdAt) >= oneWeekAgo && 
-                 (order.status === 'Delivered' || order.status === 'Completed'))
-          .reduce((sum, order) => sum + (order.total || 0), 0);
-
-        // Monthly sales (current month) - include Completed and Delivered orders
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
-        const monthlySales = orders
-          .filter(order => new Date(order.createdAt) >= startOfMonth && 
-                 (order.status === 'Delivered' || order.status === 'Completed'))
-          .reduce((sum, order) => sum + (order.total || 0), 0);
-
-        // Low stock count
-        const lowStockCount = products.filter(p => (p.stock || 0) <= 10).length;
-
-        // Completed orders count
-        const completedOrdersCount = orders.filter(order => order.status === 'Completed').length;
-
-        // Daily sales (for line chart) - include Completed and Delivered orders
-        const dailySales = Array(7).fill(0);
-        orders
-          .filter(order => new Date(order.createdAt) >= oneWeekAgo && 
-                 (order.status === 'Delivered' || order.status === 'Completed'))
-          .forEach(order => {
-            const day = new Date(order.createdAt).getDay(); // 0=Sun → 6=Sat
-            const adjustedDay = day === 0 ? 6 : day - 1;   // Make Mon first
-            dailySales[adjustedDay] += order.total || 0;
-          });
-
-        // Order status counts (for doughnut chart)
-        const statusCounts = {};
-        orders.forEach(order => {
-          const status = order.status || "Unknown";
-          statusCounts[status] = (statusCounts[status] || 0) + 1;
-        });
-
-       // In your useEffect, replace the product sales counting logic:
-
-// Top selling products (by salesCount field or fallback = orders count)
-const productSalesMap = {};
-orders.forEach(order => {
-  // Only count delivered or completed orders
-  if (order.status === 'Delivered' || order.status === 'Completed') {
-    order.items?.forEach(item => {
-      // Use the correct property name for product ID
-      const productId = item.product?._id;
-      if (productId) {
-        productSalesMap[productId] = (productSalesMap[productId] || 0) + (item.quantity || 0);
+ useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE_URL}/api/dashboard`);
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch dashboard data');
       }
-    });
-  }
-});
-
-const topSellingProducts = [...products]
-  .map(p => ({
-    ...p,
-    totalSold: productSalesMap[p._id] || 0
-  }))
-  .sort((a, b) => b.totalSold - a.totalSold)
-  .slice(0, 5);
-  
-        // Recent orders - include all statuses
-        const recentOrders = [...orders]
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .slice(0, 5);
-
-        // ✅ Set final dashboard data
-        setDashboardData({
-          stats: { salesToday, weeklySales, monthlySales, lowStockCount, completedOrdersCount },
-          lineData: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [{ data: dailySales }]
-          },
-          doughnutData: {
-            labels: Object.keys(statusCounts),
-            datasets: [{ data: Object.values(statusCounts) }]
-          },
-          topSellingProducts,
-          recentOrders
-        });
-
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
+      
+      const data = await res.json();
+      setDashboardData(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
     fetchDashboardData();
   }, []);
 
