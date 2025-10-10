@@ -9,58 +9,25 @@ export default function Reports() {
   const [salesData, setSalesData] = useState(null);
   const [topProducts, setTopProducts] = useState([]);
 
-  useEffect(() => {
-    const fetchReportData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch orders and products data
-        const [ordersResponse, productsResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/orders`),
-          fetch(`${API_BASE_URL}/api/products`)
-        ]);
-        
-        const orders = await ordersResponse.json();
-        const products = await productsResponse.json();
-
-        if (!ordersResponse.ok || !productsResponse.ok) {
-          throw new Error('Failed to fetch report data');
-        }
-
-        // Process sales data by month
-        const monthlySales = processMonthlySales(orders);
-        
-        // Calculate product sales from orders (not relying on salesCount field)
-        const productSalesMap = {};
-        orders.forEach(order => {
-          if (order.status === 'Delivered' || order.status === 'Completed') {
-            order.items?.forEach(item => {
-              // Extract the product ID from the nested product object
-              const productId = item.product?._id;
-              if (productId) {
-                productSalesMap[productId] = (productSalesMap[productId] || 0) + (item.quantity || 0);
-              }
-            });
-          }
-        });
-
-        // Get top selling products
-        const sortedProducts = [...products]
-          .map(p => ({
-            ...p,
-            salesCount: productSalesMap[p._id] || 0
-          }))
-          .sort((a, b) => b.salesCount - a.salesCount)
-          .slice(0, 3);
-
-        setSalesData(monthlySales);
-        setTopProducts(sortedProducts);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
+ useEffect(() => {
+  const fetchReportData = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE_URL}/api/reports`);
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch report data');
       }
-    };
+      
+      const data = await res.json();
+      setSalesData(data.salesData);
+      setTopProducts(data.topProducts);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
     fetchReportData();
   }, []);

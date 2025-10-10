@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { useCart } from '../components/CartContext.jsx';
 import { API_BASE_URL } from '../config/api.js';
+import { useAuth } from '../config/useauth.js';
 
 /** ---------------- Fake Stripe Modal ---------------- */
 function FakeStripeModal({ amount, onCancel, onSuccess }) {
@@ -100,6 +101,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems: contextCart, updateQuantity, removeFromCart, addToCart } = useCart();
+  const { checkAuth } = useAuth();
 
   // ✅ Prefer Buy Now items from location.state, otherwise use global CartContext
   const cartItems = location.state?.cartItems
@@ -139,6 +141,21 @@ export default function Checkout() {
       }
     };
     fetchData();
+  }, []);
+
+   // Auto-fill user details if logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    if (token && user.role === "user") {
+      setUserDetails(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone
+      }));
+    }
   }, []);
 
   // Safe cart
@@ -273,9 +290,19 @@ export default function Checkout() {
 
   /** ---------------- Create order on server ---------------- */
   const createOrderOnServer = async (payload) => {
+      const token = localStorage.getItem('token'); // ✅ Get token here
+  
+  if (!token) {
+    throw new Error('Authentication token not found. Please login again.');
+  }
+
+  console.log('Sending request with token:', token ? 'Token exists' : 'No token');
+
     const res = await fetch(`${API_BASE_URL}/api/orders`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      },
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
@@ -284,49 +311,77 @@ export default function Checkout() {
     }
     return res.json();
   };
+/** ---------------- Proceed To Pay ---------------- */
+const handleProceedPay = async () => {
+  // Check if user is authenticated
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
+  // If user is not logged in or not a regular user, redirect to login
+  if (!token || user.role !== "user") {
+    navigate('/login', { 
+      state: { 
+        from: '/checkout',
+        message: 'Please login to place your order',
+        // Preserve cart items for when they return
+        cartItems: safeCartItems.map(item => ({
+          ...item.product,
+          quantity: item.quantity
+        }))
+      } 
+    });
+    return;
+  }
 
-  /** ---------------- Proceed To Pay ---------------- */
-  const handleProceedPay = async () => {
-    setApiError('');
-    const v = validateCheckout();
-    if (!v.ok) { setApiError(v.msg); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  setApiError('');
+  const v = validateCheckout();
+  if (!v.ok) { 
+    setApiError(v.msg); 
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    return; 
+  }
 
-    if (paymentMethod === 'cod') {
-      try {
-        setSubmitting(true);
-        const payload = buildOrderPayload('pending'); // COD stays pending
-        const saved = await createOrderOnServer(payload); // stock adjusts in controller :contentReference[oaicite:3]{index=3}
-        alert(`Order placed! ID: ${saved._id}`);
-        navigate('/'); // or navigate(`/order/${saved._id}`)
-      } catch (e) {
-        setApiError(e.message);
-      } finally {
-        setSubmitting(false);
-      }
-      return;
-    }
-
-    // Card flow → open modal
-    setShowPayModal(true);
-  };
-
-  /** ---------------- Card paid callback ---------------- */
-  const handleCardPaid = async (transactionId) => {
-    setShowPayModal(false);
-    setSubmitting(true);
-    setApiError('');
+  if (paymentMethod === 'cod') {
     try {
-      const payload = buildOrderPayload('completed', transactionId); // card = completed
+      setSubmitting(true);
+      const payload = buildOrderPayload('pending');
       const saved = await createOrderOnServer(payload);
-      alert(`Payment successful! Order ID: ${saved._id}`);
-      navigate('/'); // adjust to your success page/route
+      alert(`Order placed! ID: ${saved._id}`);
+      // Clear cart after successful order
+      safeCartItems.forEach(item => removeFromCart(item.product._id));
+      navigate('/'); // You might want to create this page
     } catch (e) {
       setApiError(e.message);
     } finally {
       setSubmitting(false);
     }
-  };
+    return;
+  }
 
+  // Card flow → open modal
+  setShowPayModal(true);
+};
+
+  /** ---------------- Card paid callback ---------------- */
+const handleCardPaid = async (transactionId) => {
+  setShowPayModal(false);
+  setSubmitting(true);
+  setApiError('');
+  try {
+    const payload = buildOrderPayload('completed', transactionId);
+    const saved = await createOrderOnServer(payload);
+    alert(`Payment successful! Order ID: ${saved._id}`);
+    // Clear cart after successful order
+    safeCartItems.forEach(item => removeFromCart(item.product._id));
+    navigate('/', { 
+      state: { orderId: saved._id } 
+    });
+  } catch (e) {
+    setApiError(e.message);
+  } finally {
+    setSubmitting(false);
+  }
+};
   return (
     <div className="checkout-page">
       <Navbar />
@@ -338,6 +393,15 @@ export default function Checkout() {
             {apiError}
           </div>
         )}
+
+        {/* Login prompt banner for unauthenticated users */}
+        {!localStorage.getItem('token') && (
+          <div className="login-prompt-banner">
+            🔐 Please <a href="/login" className="login-link">login</a> to place your order
+          </div>
+        )}
+
+
 
         {/* Breadcrumb */}
         <hr className="checkout-divider" />
@@ -355,7 +419,7 @@ export default function Checkout() {
         {/* Banner */}
         <div className="checkout-banner">
           A sweet start - Enjoy 20% off your first order.
-          <a href="#" className="checkout-banner-link">Login/Signup</a>
+          <a href="/signup" className="checkout-banner-link">Login/Signup</a>
         </div>
 
         {/* Order Items */}
@@ -583,3 +647,5 @@ export default function Checkout() {
     </div>
   );
 }
+
+

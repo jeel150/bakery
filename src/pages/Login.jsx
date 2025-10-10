@@ -121,7 +121,7 @@ import '../styles/Login.css';
 import images from '../data/images';
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation  } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api.js'; // Import the config
 
 const { jarsImg } = images;
@@ -135,6 +135,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+    const location = useLocation();
 
   const { email, password } = formData;
 
@@ -144,44 +145,53 @@ function Login() {
   };
 
   const onSubmit = async e => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  try {
+    setLoading(true);
+    setError('');
+    const config = {
+      headers: { 
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true
+    };
+
+    const body = JSON.stringify({ email, password });
+    const res = await axios.post(`${API_BASE_URL}/api/auth/login`, body, config);
+
+    // Save token and user data
+    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
+
+    setSuccess('Login successful! welcome!');
+    setLoading(false);
     
-    try {
-      setLoading(true);
-      setError('');
-      const config = {
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true // Important for CORS with credentials
-      };
-
-      const body = JSON.stringify({ email, password });
+    // Redirect based on role and previous location
+    setTimeout(() => {
+      const fromLocation = location.state?.from || '/';
       
-      // Use the environment-aware API URL
-      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, body, config);
+      if (res.data.user.role === "admin" || res.data.user.isCoAdmin) {
+        navigate('/products');
+      } else if (fromLocation === '/checkout') {
+        // Redirect back to checkout with preserved cart items
+        navigate('/checkout', { 
+          state: { 
+            cartItems: location.state?.cartItems || [],
+            message: 'You can now proceed with your order'
+          }
+        });
+      } else {
+        navigate('/');
+      }
+    }, 1500);
+  } catch (err) {
+    console.error('Login error:', err);
+    setError(err.response?.data?.message || 'Login failed. Please try again.');
+    setLoading(false);
+  }
+};
 
-      // Save token and user data
-      localStorage.setItem('token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
-
-      setSuccess('Login successful! welcome!');
-      setLoading(false);
-      
-      // Redirect based on role
-      setTimeout(() => {
-        if (res.data.user.role === "admin" || res.data.user.isCoAdmin) {
-          navigate('/products');
-        } else {
-          navigate('/');
-        }
-      }, 1500);
-    } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="login-background">
@@ -196,6 +206,14 @@ function Login() {
           {/* Right form content */}
           <div className="login-right-content">
             <h2 className="login-title">LOGIN</h2>
+
+            {/*Checkout redirect message */}
+              {location.state?.from === '/checkout' && (
+                <div className="checkout-redirect-message">
+                  🛒 Complete your order after login
+                </div>
+              )}
+
             {error && <div className="error-message">{error}</div>}
             {success && <div className="success-message">{success}</div>}
             <form className="login-form" onSubmit={onSubmit}>

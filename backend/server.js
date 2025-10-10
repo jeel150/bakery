@@ -15,6 +15,7 @@ import pagesApi from "./pagesApi.js";
 import categoryRoutes from "./Routes/categoryRoutes.js";
 import uploadRoutes from "./Routes/uploadRoutes.js"; 
 import themesRoutes from "./Routes/themesRoutes.js";
+import dashboardRoutes from './Routes/dashboardRoutes.js';
 
 connectDB();
 
@@ -75,6 +76,7 @@ app.use("/api/pages", pagesApi);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/upload", uploadRoutes); 
 app.use("/api/themes", themesRoutes);
+app.use('/api', dashboardRoutes);
 
 // Test route
 app.get('/', (req, res) => {

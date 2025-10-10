@@ -170,6 +170,15 @@
   border: 1px solid #c3e6cb;
   text-align: center;
 }
+.checkout-redirect-message {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: center;
+}
 
 
 /* Tablet styles (768px and up) */
