@@ -403,24 +403,32 @@ const handleCardPaid = async (transactionId) => {
 
 
 
-        {/* Breadcrumb */}
-        <hr className="checkout-divider" />
-        <div className="checkout-breadcrumb">
-          <span className="breadcrumb-link" onClick={() => navigate('/')}>Home</span>
-          <span className="breadcrumb-separator">&gt;</span>
-          <span className="breadcrumb-link" onClick={() => navigate('/cakes')}>Cart</span>
-          <span className="breadcrumb-separator">&gt;</span>
-          <span className="breadcrumb-link">Checkout</span>
-        </div>
+     
 
-        <div className="checkout-title">YOUR SHOPPING CART</div>
-        <hr className="checkout-divider-secondary" />
+{/* Breadcrumb */}
+<hr className="checkout-divider" />
+<div className="checkout-breadcrumb">
+  <span className="breadcrumb-link" onClick={() => navigate('/')}>Home</span>
+  <span className="breadcrumb-separator">&gt;</span>
+  <span className="breadcrumb-link" onClick={() => navigate('/cakes')}>Cart</span>
+  <span className="breadcrumb-separator">&gt;</span>
+  <span className="breadcrumb-link">Checkout</span>
+</div>
 
-        {/* Banner */}
-        <div className="checkout-banner">
-          A sweet start - Enjoy 20% off your first order.
-          <a href="/signup" className="checkout-banner-link">Login/Signup</a>
-        </div>
+<div className="checkout-title">YOUR SHOPPING CART</div>
+<hr className="checkout-divider-secondary" />
+
+{/* Banner - Only show for guest users */}
+{!localStorage.getItem('token') && (
+  <div className="checkout-banner">
+    A sweet start - Enjoy 20% off your first order.
+    <a href="/signup" className="checkout-banner-link">Login/Signup</a>
+  </div>
+)}
+
+{/* Order Items */}
+<div className="checkout-order-title">Your Order</div>
+
 
         {/* Order Items */}
         <div className="checkout-order-title">Your Order</div>

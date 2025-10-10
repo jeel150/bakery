@@ -23,6 +23,7 @@ import Invoice from './pages/invoice.jsx';
 import OrderHistory from './pages/orderhistory.jsx';
 import OrderDetails from './pages/orderdetails.jsx';
 import { ThemeProvider } from "./components/ThemeContext.jsx";
+import CategoryManagement from '../Admin/src/pages/CategoryManagement.jsx';
 // import PrivateRoute from '../src/components/PrivateRoute.jsx';
 // import PublicRoute from '../src/components/PublicRoute.jsx';
 
@@ -55,6 +56,7 @@ function MainProvider() {
               <Route path="/invoice" element={<Invoice />} />
               <Route path="/orderhistory" element={<OrderHistory />} />
               <Route path="/orderdetails" element={<OrderDetails/>}/>
+              <Route path="/categories" element={<CategoryManagement/>}/>
             </Routes>
             <CartSidebar isOpen={isCartOpen} onClose={closeCart}/>
           </BrowserRouter>
