@@ -156,6 +156,7 @@ const Footer = ({ className = '', onSubscribe }) => {
               <li onClick={() => navigate('/returnpolicy')} style={{cursor: 'pointer'}}>Privacy Policy</li>
               <li onClick={() => navigate('/about')} style={{cursor: 'pointer'}}>FAQ</li>
               <li onClick={() => navigate('/contact')} style={{cursor: 'pointer'}}>Contact Us</li>
+              <li onClick={() => navigate('/categories')} style={{cursor: 'pointer'}}>CMS</li>
             </ul>
           </div>
           <div className="rb-footer-col rb-footer-subscribe">
