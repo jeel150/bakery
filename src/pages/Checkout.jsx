@@ -131,81 +131,132 @@ export default function Checkout() {
   const isUserLoggedIn = () => {
     return !!localStorage.getItem('user');
   };
-
-  // Fetch products
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const productsRes = await fetch(`${API_BASE_URL}/api/products`);
-        const productsData = await productsRes.json();
-        setAllProducts(productsData);
-      } catch (err) {
-        console.error("Error fetching checkout data", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  // ✅ AUTO-FILL USER DATA FROM localStorage - FOR LOGGED-IN USERS
-  useEffect(() => {
-    const autoFillUserData = () => {
-      const savedUser = localStorage.getItem('user');
-      if (savedUser) {
-        try {
-          const userData = JSON.parse(savedUser);
-          console.log('Auto-filling user data:', userData);
-          
-          setUserDetails(prev => ({
-            name: userData.name || prev.name,
-            email: userData.email || prev.email,
-            phone: userData.phone || prev.phone
-          }));
-        } catch (error) {
-          console.error('Error parsing user data from localStorage:', error);
-        }
-      }
-    };
-
-    // Fill immediately if user is logged in
-    autoFillUserData();
-
-    // Also fill when returning from login/signup
-    if (location.state?.from === '/login' || location.state?.from === '/signup') {
-      autoFillUserData();
+// Fetch products
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const productsRes = await fetch(`${API_BASE_URL}/api/products`);
+      const productsData = await productsRes.json();
+      setAllProducts(productsData);
+    } catch (err) {
+      console.error("Error fetching checkout data", err);
+    } finally {
+      setLoading(false);
     }
-  }, [location.state]);
+  };
+  fetchData();
+}, []);
 
-  // ✅ SAVE FORM DATA TO localStorage AS USER TYPES
-  useEffect(() => {
-    // Only save if user has started filling the form
-    if (userDetails.name || userDetails.email || userDetails.phone || 
-        deliveryAddress.city || deliveryAddress.address) {
-      const formData = {
-        userDetails,
-        deliveryAddress,
-        shippingMethod,
-        selectedLocation,
-        deliveryDate,
-        deliveryTime,
-        paymentMethod
-      };
-      localStorage.setItem('checkoutFormData', JSON.stringify(formData));
-    }
-  }, [userDetails, deliveryAddress, shippingMethod, selectedLocation, deliveryDate, deliveryTime, paymentMethod]);
-
-  // ✅ LOAD SAVED FORM DATA FROM localStorage ON COMPONENT MOUNT
-  useEffect(() => {
+// ✅ NEW: Detect user changes and clear old cached data
+useEffect(() => {
+  const checkUserChange = () => {
+    const currentUser = localStorage.getItem('user');
     const savedFormData = localStorage.getItem('checkoutFormData');
-    if (savedFormData) {
+    
+    if (currentUser && savedFormData) {
       try {
+        const userData = JSON.parse(currentUser);
         const formData = JSON.parse(savedFormData);
-        console.log('Loading saved form data:', formData);
         
-        // Only auto-fill if user hasn't manually entered data yet
+        // If cached form data belongs to different user, clear it
+        if (formData.userDetails && formData.userDetails.email !== userData.email) {
+          console.log('Clearing old form data for different user');
+          localStorage.removeItem('checkoutFormData');
+        }
+      } catch (error) {
+        console.error('Error checking user change:', error);
+      }
+    }
+  };
+
+  // Check on component mount
+  checkUserChange();
+
+  // Listen for storage changes (when user logs in/out in another tab)
+  window.addEventListener('storage', checkUserChange);
+  
+  return () => window.removeEventListener('storage', checkUserChange);
+}, []);
+
+// ✅ UPDATED: AUTO-FILL USER DATA - with user change detection
+useEffect(() => {
+  const autoFillUserData = () => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        console.log('Auto-filling user data for:', userData.name);
+        
+        // Always use current user data, never keep old cached data for different user
+        setUserDetails({
+          name: userData.name || '',
+          email: userData.email || '',
+          phone: userData.phone || ''
+        });
+
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  };
+
+  // Fill immediately if user is logged in
+  autoFillUserData();
+
+  // Also fill when returning from login/signup - with force refresh
+  if (location.state?.from === '/login' || location.state?.from === '/signup') {
+    console.log('Returning from auth, refreshing user data');
+    // Clear any cached form data to ensure fresh start
+    localStorage.removeItem('checkoutFormData');
+    autoFillUserData();
+  }
+}, [location.state]);
+
+// ✅ UPDATED: SAVE FORM DATA TO localStorage AS USER TYPES
+useEffect(() => {
+  const savedUser = localStorage.getItem('user');
+  if (!savedUser) return; // Don't save if no user is logged in
+
+  try {
+    const userData = JSON.parse(savedUser);
+    
+    // Only save if the form data belongs to current user
+    if (userDetails.email === userData.email) {
+      if (userDetails.name || userDetails.email || userDetails.phone || 
+          deliveryAddress.city || deliveryAddress.address) {
+        const formData = {
+          userDetails,
+          deliveryAddress,
+          shippingMethod,
+          selectedLocation,
+          deliveryDate,
+          deliveryTime,
+          paymentMethod
+        };
+        localStorage.setItem('checkoutFormData', JSON.stringify(formData));
+      }
+    }
+  } catch (error) {
+    console.error('Error saving form data:', error);
+  }
+}, [userDetails, deliveryAddress, shippingMethod, selectedLocation, deliveryDate, deliveryTime, paymentMethod]);
+
+// ✅ UPDATED: LOAD SAVED FORM DATA - with user verification
+useEffect(() => {
+  const savedFormData = localStorage.getItem('checkoutFormData');
+  const currentUser = localStorage.getItem('user');
+  
+  if (savedFormData && currentUser) {
+    try {
+      const formData = JSON.parse(savedFormData);
+      const userData = JSON.parse(currentUser);
+      
+      console.log('Loading saved form data for:', userData.name);
+      
+      // Only load form data if it belongs to current user
+      if (formData.userDetails && formData.userDetails.email === userData.email) {
         setUserDetails(prev => ({
-          // Don't override with empty values from saved data
+          // Prefer saved data, but don't override with empty values
           name: formData.userDetails?.name || prev.name,
           email: formData.userDetails?.email || prev.email,
           phone: formData.userDetails?.phone || prev.phone
@@ -217,12 +268,18 @@ export default function Checkout() {
         setDeliveryDate(formData.deliveryDate || '');
         setDeliveryTime(formData.deliveryTime || '');
         setPaymentMethod(formData.paymentMethod || 'cod');
-      } catch (error) {
-        console.error('Error parsing saved form data:', error);
+      } else {
+        console.log('Saved form data belongs to different user, ignoring');
+        // If form data doesn't belong to current user, clear it
+        localStorage.removeItem('checkoutFormData');
       }
+    } catch (error) {
+      console.error('Error parsing saved form data:', error);
+      // Clear corrupted data
+      localStorage.removeItem('checkoutFormData');
     }
-  }, []);
-
+  }
+}, []);
   // Safe cart
   const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
 
@@ -486,13 +543,21 @@ const handleCardPaid = async (transactionId) => {
 
         {/* Banner */}
         <div className="checkout-banner">
-          {isUserLoggedIn() ? (
-            <>
-              ✅ Welcome back! {userDetails.name || JSON.parse(localStorage.getItem('user')).name} enjoy your shopping,
-              <span style={{marginLeft: '10px', fontSize: '14px'}}>
-                Not you? <a href="/logout" style={{color: '#2A110A', textDecoration: 'underline'}}>Log out</a>
-              </span>
-            </>
+         {isUserLoggedIn() ? (
+  <>
+    ✅ Welcome back! {(() => {
+      // Always get fresh data from localStorage for display
+      try {
+        const currentUser = JSON.parse(localStorage.getItem('user'));
+        return currentUser?.name || userDetails.name;
+      } catch {
+        return userDetails.name;
+      }
+    })()} enjoy your shopping,
+    <span style={{marginLeft: '10px', fontSize: '14px'}}>
+      Not you? <a href="/signup" style={{color: '#2A110A', textDecoration: 'underline'}}>Log out</a>
+    </span>
+  </>
           ) : (
             <>
               A sweet start - Enjoy 20% off your first order.
