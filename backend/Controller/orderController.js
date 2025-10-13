@@ -1,12 +1,12 @@
 import Order from "../Models/orderModel.js";
 import Product from "../Models/productModel.js";
 
-// Get all orders for the logged-in user
+// Get all orders (for admin - keeps existing functionality)
 export const getOrders = async (req, res) => {
   try {
     const { status, date } = req.query;
     
-    let query = { 'customer.email': req.user.email }; // Filter by logged-in user's email
+    let query = {};
     
     if (status) {
       query.status = status;
@@ -25,27 +25,83 @@ export const getOrders = async (req, res) => {
       };
     }
     
-    // Populate product details if product still exists
     const orders = await Order.find(query)
-      .populate("items.product", "name image price")
+      .populate("items.product", "name price image")
+      .populate("user", "name email") // Populate user info
       .sort({ createdAt: -1 });
 
-    res.json(orders);
+    // Process orders to ensure proper image URLs
+    const processedOrders = orders.map(order => {
+      const orderObj = order.toObject();
+      
+      // Process each item in the order
+      orderObj.items = orderObj.items.map(item => {
+        // Use the snapshot image from order, or fallback to populated product image
+        let imageUrl = item.image;
+        
+        // If no image in snapshot, try to get from populated product
+        if (!imageUrl && item.product && item.product.image) {
+          imageUrl = item.product.image;
+        }
+        
+        // Convert relative path to absolute URL if needed
+        if (imageUrl && !imageUrl.startsWith('http')) {
+          // Remove leading slash if present to avoid double slashes
+          const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+          imageUrl = `${process.env.API_BASE_URL || 'http://localhost:5000'}/${cleanPath}`;
+        }
+        
+        return {
+          ...item,
+          image: imageUrl || '/placeholder.png'
+        };
+      });
+      
+      return orderObj;
+    });
+
+    res.json(processedOrders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get orders by user email (alternative approach)
-export const getOrdersByUser = async (req, res) => {
+// ✅ NEW: Get orders for specific user
+export const getUserOrders = async (req, res) => {
   try {
-    const userEmail = req.user.email; // From authenticated user
+    // Get user ID from authenticated user (from auth middleware)
+    const userId = req.user.id;
     
-    const orders = await Order.find({ 'customer.email': userEmail })
-      .populate("items.product", "name image price")
+    const orders = await Order.find({ user: userId })
+      .populate("items.product", "name price image")
       .sort({ createdAt: -1 });
 
-    res.json(orders);
+    // Process orders to ensure proper image URLs
+    const processedOrders = orders.map(order => {
+      const orderObj = order.toObject();
+      
+      orderObj.items = orderObj.items.map(item => {
+        let imageUrl = item.image;
+        
+        if (!imageUrl && item.product && item.product.image) {
+          imageUrl = item.product.image;
+        }
+        
+        if (imageUrl && !imageUrl.startsWith('http')) {
+          const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+          imageUrl = `${process.env.API_BASE_URL || 'http://localhost:5000'}/${cleanPath}`;
+        }
+        
+        return {
+          ...item,
+          image: imageUrl || '/placeholder.png'
+        };
+      });
+      
+      return orderObj;
+    });
+
+    res.json(processedOrders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -55,11 +111,6 @@ export const getOrdersByUser = async (req, res) => {
 export const createOrder = async (req, res) => {
   try {
     const { items, total, customer, shipping, payment } = req.body;
-
-    // Verify that the order is being created for the logged-in user
-    if (customer.email !== req.user.email) {
-      return res.status(403).json({ message: "You can only create orders for yourself" });
-    }
 
     const enrichedItems = [];
 
@@ -81,9 +132,7 @@ export const createOrder = async (req, res) => {
         name: product.name,
         price: product.price,
         quantity: item.quantity,
-        image: product.image || null,
-        weight: product.weight,
-        customWeight: product.customWeight
+        image: product.image // ✅ snapshot saved in order
       });
     }
 
@@ -93,38 +142,67 @@ export const createOrder = async (req, res) => {
       customer,
       shipping,
       payment,
+      user: req.user.id, // ✅ Add user ID from authenticated user
       status: "Pending"
     });
 
     const savedOrder = await order.save();
-    res.status(201).json(savedOrder);
+    
+    // Populate the saved order before sending response
+    const populatedOrder = await Order.findById(savedOrder._id)
+      .populate("items.product", "name price image")
+      .populate("user", "name email");
+
+    res.status(201).json(populatedOrder);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get single order by ID - with user verification
+// Get single order by ID
 export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate("items.product", "name price image");
+      .populate("items.product", "name price image")
+      .populate("user", "name email");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Check if the order belongs to the logged-in user
-    if (order.customer.email !== req.user.email) {
-      return res.status(403).json({ message: "Access denied. This order does not belong to you." });
+    // Check if user is authorized to view this order
+    // Allow admin or the user who created the order
+    if (req.user.role !== 'admin' && order.user._id.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized to view this order" });
     }
 
-    res.json(order);
+    // Process the order to ensure proper image URLs
+    const orderObj = order.toObject();
+    orderObj.items = orderObj.items.map(item => {
+      let imageUrl = item.image;
+      
+      if (!imageUrl && item.product && item.product.image) {
+        imageUrl = item.product.image;
+      }
+      
+      if (imageUrl && !imageUrl.startsWith('http')) {
+        const cleanPath = imageUrl.startsWith('/') ? imageUrl.substring(1) : imageUrl;
+        imageUrl = `${process.env.API_BASE_URL || 'http://localhost:5000'}/${cleanPath}`;
+      }
+      
+      return {
+        ...item,
+        image: imageUrl || '/placeholder.png'
+      };
+    });
+
+    res.json(orderObj);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Refund an order - with user verification
+// Refund an order
 export const refundOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -132,9 +210,9 @@ export const refundOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Check if the order belongs to the logged-in user
-    if (order.customer.email !== req.user.email) {
-      return res.status(403).json({ message: "Access denied. This order does not belong to you." });
+    // Check if user is authorized to refund this order
+    if (req.user.role !== 'admin' && order.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized to refund this order" });
     }
 
     if (order.status !== "Completed") {
@@ -159,7 +237,7 @@ export const refundOrder = async (req, res) => {
   }
 };
 
-// Update order status (admin only or with proper authorization)
+// Update order status
 export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -169,10 +247,10 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Optional: Add admin check here if you want only admins to update status
-    // if (!req.user.isAdmin) {
-    //   return res.status(403).json({ message: "Access denied. Admin privileges required." });
-    // }
+    // Only admin can update order status
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Not authorized to update order status" });
+    }
 
     order.status = status;
     await order.save();

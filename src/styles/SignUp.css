@@ -160,6 +160,16 @@
   text-decoration: none;
   font-weight: bold;
 }
+.checkout-redirect-message {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: 500;
+}
 
 /* Tablet styles (768px and up) */
 @media (min-width: 768px) {

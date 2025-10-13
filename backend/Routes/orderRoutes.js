@@ -5,25 +5,30 @@ import {
   getOrderById, 
   updateOrderStatus,
   refundOrder,
+  getUserOrders, // ✅ Import the new function
 } from "../Controller/orderController.js";
-import { protect } from "../middleware/authMiddleware.js"; // Your auth middleware
+import {authMiddleware }from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Apply authentication middleware to all order routes
-router.use(protect);
+// Public routes (if any)
 
+// Protected routes
 router.route('/')
-  .get(getOrders)
-  .post(createOrder);
-  
+  .get(authMiddleware, getOrders) // Admin can see all orders
+  .post(authMiddleware, createOrder); // Authenticated users can create orders
+
+// ✅ NEW: Get orders for logged-in user only
+router.route('/my-orders')
+  .get(authMiddleware, getUserOrders);
+
 router.route('/:id')
-  .get(getOrderById);
+  .get(authMiddleware, getOrderById); // Authenticated users can view their own orders
 
 router.route('/:id/status')
-  .put(updateOrderStatus);
+  .put(authMiddleware, updateOrderStatus); // Admin only
 
 router.route('/:id/refund')
-  .post(refundOrder);
+  .post(authMiddleware, refundOrder); // Admin or order owner
 
 export default router;

@@ -101,7 +101,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems: contextCart, updateQuantity, removeFromCart, addToCart } = useCart();
-  const { checkAuth } = useAuth();
+  const { checkAuth, user } = useAuth();
 
   // ✅ Prefer Buy Now items from location.state, otherwise use global CartContext
   const cartItems = location.state?.cartItems
@@ -127,6 +127,11 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState('');
 
+  // Check if user is logged in
+  const isUserLoggedIn = () => {
+    return !!localStorage.getItem('user');
+  };
+
   // Fetch products
   useEffect(() => {
     const fetchData = async () => {
@@ -143,18 +148,78 @@ export default function Checkout() {
     fetchData();
   }, []);
 
-   // Auto-fill user details if logged in
+  // ✅ AUTO-FILL USER DATA FROM localStorage - FOR LOGGED-IN USERS
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    if (token && user.role === "user") {
-      setUserDetails(prev => ({
-        ...prev,
-        name: user.name || prev.name,
-        email: user.email || prev.email,
-        phone: user.phone || prev.phone
-      }));
+    const autoFillUserData = () => {
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          console.log('Auto-filling user data:', userData);
+          
+          setUserDetails(prev => ({
+            name: userData.name || prev.name,
+            email: userData.email || prev.email,
+            phone: userData.phone || prev.phone
+          }));
+        } catch (error) {
+          console.error('Error parsing user data from localStorage:', error);
+        }
+      }
+    };
+
+    // Fill immediately if user is logged in
+    autoFillUserData();
+
+    // Also fill when returning from login/signup
+    if (location.state?.from === '/login' || location.state?.from === '/signup') {
+      autoFillUserData();
+    }
+  }, [location.state]);
+
+  // ✅ SAVE FORM DATA TO localStorage AS USER TYPES
+  useEffect(() => {
+    // Only save if user has started filling the form
+    if (userDetails.name || userDetails.email || userDetails.phone || 
+        deliveryAddress.city || deliveryAddress.address) {
+      const formData = {
+        userDetails,
+        deliveryAddress,
+        shippingMethod,
+        selectedLocation,
+        deliveryDate,
+        deliveryTime,
+        paymentMethod
+      };
+      localStorage.setItem('checkoutFormData', JSON.stringify(formData));
+    }
+  }, [userDetails, deliveryAddress, shippingMethod, selectedLocation, deliveryDate, deliveryTime, paymentMethod]);
+
+  // ✅ LOAD SAVED FORM DATA FROM localStorage ON COMPONENT MOUNT
+  useEffect(() => {
+    const savedFormData = localStorage.getItem('checkoutFormData');
+    if (savedFormData) {
+      try {
+        const formData = JSON.parse(savedFormData);
+        console.log('Loading saved form data:', formData);
+        
+        // Only auto-fill if user hasn't manually entered data yet
+        setUserDetails(prev => ({
+          // Don't override with empty values from saved data
+          name: formData.userDetails?.name || prev.name,
+          email: formData.userDetails?.email || prev.email,
+          phone: formData.userDetails?.phone || prev.phone
+        }));
+        
+        setDeliveryAddress(formData.deliveryAddress || { city: '', landmark: '', address: '' });
+        setShippingMethod(formData.shippingMethod || 'pickup');
+        setSelectedLocation(formData.selectedLocation || '');
+        setDeliveryDate(formData.deliveryDate || '');
+        setDeliveryTime(formData.deliveryTime || '');
+        setPaymentMethod(formData.paymentMethod || 'cod');
+      } catch (error) {
+        console.error('Error parsing saved form data:', error);
+      }
     }
   }, []);
 
@@ -289,99 +354,111 @@ export default function Checkout() {
   };
 
   /** ---------------- Create order on server ---------------- */
-  const createOrderOnServer = async (payload) => {
-      const token = localStorage.getItem('token'); // ✅ Get token here
-  
-  if (!token) {
-    throw new Error('Authentication token not found. Please login again.');
-  }
-
-  console.log('Sending request with token:', token ? 'Token exists' : 'No token');
+const createOrderOnServer = async (payload) => {
+  try {
+    // ✅ FIXED: Get token inside this function
+    const token = localStorage.getItem('token');
+    console.log('Creating order with token:', token ? 'Token exists' : 'NO TOKEN');
+    
+    if (!token) {
+      throw new Error('No authentication token found. Please login again.');
+    }
 
     const res = await fetch(`${API_BASE_URL}/api/orders`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`  // ✅ Use the token
       },
       body: JSON.stringify(payload)
     });
+    
     if (!res.ok) {
-      const err = await res.json().catch(()=>({message:'Order creation failed'}));
+      const err = await res.json().catch(() => ({ message: 'Order creation failed' }));
       throw new Error(err.message || 'Order creation failed');
     }
     return res.json();
-  };
-/** ---------------- Proceed To Pay ---------------- */
-const handleProceedPay = async () => {
-  // Check if user is authenticated
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  
-  // If user is not logged in or not a regular user, redirect to login
-  if (!token || user.role !== "user") {
-    navigate('/login', { 
-      state: { 
-        from: '/checkout',
-        message: 'Please login to place your order',
-        // Preserve cart items for when they return
-        cartItems: safeCartItems.map(item => ({
-          ...item.product,
-          quantity: item.quantity
-        }))
-      } 
-    });
-    return;
+  } catch (error) {
+    console.error('Order creation error:', error);
+    throw error;
   }
-
-  setApiError('');
-  const v = validateCheckout();
-  if (!v.ok) { 
-    setApiError(v.msg); 
-    window.scrollTo({ top: 0, behavior: 'smooth' }); 
-    return; 
-  }
-
-  if (paymentMethod === 'cod') {
-    try {
-      setSubmitting(true);
-      const payload = buildOrderPayload('pending');
-      const saved = await createOrderOnServer(payload);
-      alert(`Order placed! ID: ${saved._id}`);
-      // Clear cart after successful order
-      safeCartItems.forEach(item => removeFromCart(item.product._id));
-      navigate('/'); // You might want to create this page
-    } catch (e) {
-      setApiError(e.message);
-    } finally {
-      setSubmitting(false);
-    }
-    return;
-  }
-
-  // Card flow → open modal
-  setShowPayModal(true);
 };
 
-  /** ---------------- Card paid callback ---------------- */
+/** ---------------- Proceed To Pay ---------------- */
+const handleProceedPay = async () => {
+  const token = localStorage.getItem('token'); // ✅ Get token here
+  
+  const isAuthenticated = checkAuth(true, safeCartItems);
+  if (!isAuthenticated) {
+    return; 
+  }
+  
+  // If user is authenticated, double-check we have their data
+  const savedUser = localStorage.getItem('user');
+  
+  // ✅ FIXED: Corrected the logic condition
+  if ((!token || !savedUser) && (!userDetails.name || !userDetails.email)) {
+    try {
+      const userData = JSON.parse(savedUser);
+      setUserDetails(prev => ({
+        name: userData.name || prev.name,
+        email: userData.email || prev.email,
+        phone: userData.phone || prev.phone
+      }));
+    } catch (error) {
+      console.error('Error filling user data during auth check:', error);
+    }
+  }    
+    setApiError('');
+    const v = validateCheckout();
+    if (!v.ok) { 
+      setApiError(v.msg); 
+      window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      return; 
+    }
+
+    if (paymentMethod === 'cod') {
+      try {
+        setSubmitting(true);
+        const payload = buildOrderPayload('pending');
+        const saved = await createOrderOnServer(payload);
+        alert(`Order placed! ID: ${saved._id}`);
+        // Clear cart after successful order
+        safeCartItems.forEach(item => removeFromCart(item.product._id));
+        navigate('/');
+      } catch (e) {
+        setApiError(e.message);
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    // Card flow → open modal
+    setShowPayModal(true);
+  };
+/** ---------------- Card paid callback ---------------- */
 const handleCardPaid = async (transactionId) => {
   setShowPayModal(false);
   setSubmitting(true);
   setApiError('');
   try {
     const payload = buildOrderPayload('completed', transactionId);
-    const saved = await createOrderOnServer(payload);
+    const saved = await createOrderOnServer(payload); // ✅ This will now work
+
+    // ✅ Clear saved form data after successful order
+    localStorage.removeItem('checkoutFormData');
+
     alert(`Payment successful! Order ID: ${saved._id}`);
-    // Clear cart after successful order
     safeCartItems.forEach(item => removeFromCart(item.product._id));
-    navigate('/', { 
-      state: { orderId: saved._id } 
-    });
+    navigate('/');
   } catch (e) {
     setApiError(e.message);
   } finally {
     setSubmitting(false);
   }
 };
+
   return (
     <div className="checkout-page">
       <Navbar />
@@ -394,41 +471,65 @@ const handleCardPaid = async (transactionId) => {
           </div>
         )}
 
-        {/* Login prompt banner for unauthenticated users */}
-        {!localStorage.getItem('token') && (
-          <div className="login-prompt-banner">
-            🔐 Please <a href="/login" className="login-link">login</a> to place your order
-          </div>
-        )}
+        {/* Breadcrumb */}
+        <hr className="checkout-divider" />
+        <div className="checkout-breadcrumb">
+          <span className="breadcrumb-link" onClick={() => navigate('/')}>Home</span>
+          <span className="breadcrumb-separator">&gt;</span>
+          <span className="breadcrumb-link" onClick={() => navigate('/cakes')}>Cart</span>
+          <span className="breadcrumb-separator">&gt;</span>
+          <span className="breadcrumb-link">Checkout</span>
+        </div>
 
+        <div className="checkout-title">YOUR SHOPPING CART</div>
+        <hr className="checkout-divider-secondary" />
 
-
-     
-
-{/* Breadcrumb */}
-<hr className="checkout-divider" />
-<div className="checkout-breadcrumb">
-  <span className="breadcrumb-link" onClick={() => navigate('/')}>Home</span>
-  <span className="breadcrumb-separator">&gt;</span>
-  <span className="breadcrumb-link" onClick={() => navigate('/cakes')}>Cart</span>
-  <span className="breadcrumb-separator">&gt;</span>
-  <span className="breadcrumb-link">Checkout</span>
-</div>
-
-<div className="checkout-title">YOUR SHOPPING CART</div>
-<hr className="checkout-divider-secondary" />
-
-{/* Banner - Only show for guest users */}
-{!localStorage.getItem('token') && (
-  <div className="checkout-banner">
-    A sweet start - Enjoy 20% off your first order.
-    <a href="/signup" className="checkout-banner-link">Login/Signup</a>
-  </div>
-)}
-
-{/* Order Items */}
-<div className="checkout-order-title">Your Order</div>
-
+        {/* Banner */}
+        <div className="checkout-banner">
+          {isUserLoggedIn() ? (
+            <>
+              ✅ Welcome back! {userDetails.name || JSON.parse(localStorage.getItem('user')).name} enjoy your shopping,
+              <span style={{marginLeft: '10px', fontSize: '14px'}}>
+                Not you? <a href="/logout" style={{color: '#2A110A', textDecoration: 'underline'}}>Log out</a>
+              </span>
+            </>
+          ) : (
+            <>
+              A sweet start - Enjoy 20% off your first order.
+              <a 
+                href="#" 
+                className="checkout-banner-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  
+                  // Save current form state before redirecting
+                  const formDataToSave = {
+                    userDetails,
+                    deliveryAddress,
+                    shippingMethod,
+                    selectedLocation,
+                    deliveryDate,
+                    deliveryTime,
+                    paymentMethod,
+                    cartItems: safeCartItems
+                  };
+                  
+                  localStorage.setItem('checkoutFormData', JSON.stringify(formDataToSave));
+                  
+                  navigate('/signup', { 
+                    state: { 
+                      from: '/checkout',
+                      cartItems: safeCartItems,
+                      formData: formDataToSave // Also pass via state as backup
+                    } 
+                  });
+                }}
+              >
+                Login/Signup
+              </a>
+            </>
+          )}
+        </div>
 
         {/* Order Items */}
         <div className="checkout-order-title">Your Order</div>
@@ -534,7 +635,30 @@ const handleCardPaid = async (transactionId) => {
 
           {/* Your Details */}
           <div className="user-details-section">
-            <h3 className="section-title">Your Details</h3>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
+              <h3 className="section-title">Your Details</h3>
+              {isUserLoggedIn() && (
+                <button 
+                  type="button"
+                  className="clear-form-btn"
+                  onClick={() => {
+                    setUserDetails({ name: '', phone: '', email: '' });
+                    setDeliveryAddress({ city: '', landmark: '', address: '' });
+                    localStorage.removeItem('checkoutFormData');
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #ccc',
+                    padding: '5px 10px',
+                    borderRadius: '5px',
+                    fontSize: '12px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Clear Form
+                </button>
+              )}
+            </div>
             <div className="form-row">
               <input type="text" placeholder="Name" value={userDetails.name} onChange={(e) => handleUserDetailsChange('name', e.target.value)} className="form-input" required />
               <input type="tel" placeholder="Phone" value={userDetails.phone} onChange={(e) => handleUserDetailsChange('phone', e.target.value)} className="form-input" required />
@@ -655,5 +779,3 @@ const handleCardPaid = async (transactionId) => {
     </div>
   );
 }
-
-

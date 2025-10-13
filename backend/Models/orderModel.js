@@ -11,7 +11,7 @@ const orderSchema = new mongoose.Schema(
         name: { type: String, required: true },
         quantity: { type: Number, required: true, default: 1 },
         price: { type: Number, required: true },
-        image: { type: String }
+        image: { type: String, required: true }
       },
     ],
     total: { type: Number, required: true, default: 0 },
@@ -20,6 +20,10 @@ const orderSchema = new mongoose.Schema(
       email: { type: String, required: true },
       phone: { type: String, required: true }
     },
+     user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
     shipping: {
       method: { type: String, enum: ['delivery', 'pickup'], required: true },
       address: {
