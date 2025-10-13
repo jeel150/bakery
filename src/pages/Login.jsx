@@ -144,7 +144,8 @@ function Login() {
     setError(''); // Clear error when user starts typing
   };
 
-  const onSubmit = async e => {
+  // In Login.jsx - Update the onSubmit function
+const onSubmit = async e => {
   e.preventDefault();
   
   try {
@@ -169,7 +170,7 @@ function Login() {
     
     // Redirect based on role and previous location
     setTimeout(() => {
-      const fromLocation = location.state?.from || '/';
+      const fromLocation = location.state?.from;
       
       if (res.data.user.role === "admin" || res.data.user.isCoAdmin) {
         navigate('/products');
@@ -191,7 +192,6 @@ function Login() {
     setLoading(false);
   }
 };
-
 
   return (
     <div className="login-background">

@@ -13,7 +13,6 @@ import { CartSidebarContext } from './data/CartSidebarContext.js';
 import { CartProvider } from '../src/components/CartContext.jsx';
 import Course from './pages/course.jsx';
 import ViewCourse from './pages/viewcourse.jsx';
-import Celebrate from './pages/celebrate.jsx';
 import About from './pages/about.jsx';
 import Contact from './pages/contact.jsx';
 import Signup from './pages/SignUp.jsx';
@@ -24,8 +23,8 @@ import OrderHistory from './pages/orderhistory.jsx';
 import OrderDetails from './pages/orderdetails.jsx';
 import { ThemeProvider } from "./components/ThemeContext.jsx";
 import CategoryManagement from '../Admin/src/pages/CategoryManagement.jsx';
-// import PrivateRoute from '../src/components/PrivateRoute.jsx';
-// import PublicRoute from '../src/components/PublicRoute.jsx';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 
 function MainProvider() {
@@ -47,7 +46,6 @@ function MainProvider() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/courses" element={<Course />} />
               <Route path="/viewcourse" element={<ViewCourse />} />
-              <Route path="/celebrate" element={<Celebrate />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/signup" element={<Signup /> } />

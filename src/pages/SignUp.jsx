@@ -168,7 +168,7 @@ function Signup() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const onSubmit = async e => {
+  const onSubmit = async e => {
   e.preventDefault();
   
   if (password !== passwordConfirm) {
@@ -192,22 +192,22 @@ function Signup() {
     localStorage.setItem('token', res.data.token);
     localStorage.setItem('user', JSON.stringify(res.data.user));
 
-    // Redirect based on role
+    // Redirect based on where user came from
+    const fromLocation = location.state?.from;
+    
     if (res.data.user.role === "admin" || res.data.user.isCoAdmin) {
       navigate('/products');
+    } else if (fromLocation === '/checkout') {
+      // Redirect back to checkout with preserved cart items
+      navigate('/checkout', { 
+        state: { 
+          cartItems: location.state?.cartItems || [],
+          message: 'Account created! You can now proceed with your order'
+        }
+      });
     } else {
-      // For regular users, redirect to checkout if they came from there
-      const fromLocation = location.state?.from;
-      if (fromLocation === '/checkout') {
-        navigate('/checkout', { 
-          state: { 
-            cartItems: location.state?.cartItems || [],
-            message: 'Account created! You can now proceed with your order'
-          }
-        });
-      } else {
-        navigate('/');
-      }
+      // Default redirect for regular signups not from checkout
+      navigate('/');
     }
   } catch (err) {
     console.error('Signup error:', err);
@@ -216,29 +216,28 @@ function Signup() {
   }
 };
 
-
   return (
     <div className="signup-background">
-      <div className="signup-container">
-        <div className="signup-content-wrapper">
-          
-          {/* Left image */}
-          <div className="signup-left-image">
-            <img src={jarsImg} alt="Decorative jars" className="signup-image-style" />
-          </div>
+    <div className="signup-container">
+      <div className="signup-content-wrapper">
+        
+        {/* Left image */}
+        <div className="signup-left-image">
+          <img src={jarsImg} alt="Decorative jars" className="signup-image-style" />
+        </div>
 
-          {/* Right form content */}
-          <div className="signup-right-content">
-            <h2 className="signup-title">SIGNUP</h2>
+        {/* Right form content */}
+        <div className="signup-right-content">
+          <h2 className="signup-title">SIGNUP</h2>
 
-           {/*Checkout redirect message*/}
-            {location.state?.from === '/checkout' && (
-              <div className="checkout-redirect-message">
-               🛒 Complete your order after signing up
-              </div>
-            )}
+          {/* Enhanced checkout redirect message */}
+          {location.state?.from === '/checkout' && (
+            <div className="checkout-redirect-message">
+              🛒 Complete your order after signing up
+            </div>
+          )}
 
-            {error && <div className="error-message">{error}</div>}
+          {error && <div className="error-message">{error}</div>}
             <form className="signup-form" onSubmit={onSubmit}>
               <input 
                 type="text" 

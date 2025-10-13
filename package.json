@@ -16,7 +16,7 @@
     "@mui/material": "^7.3.4",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.12.2",
-    "bootstrap": "^5.3.7",
+    "bootstrap": "^5.3.8",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
     "react": "^19.1.0",
