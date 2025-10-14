@@ -18,5 +18,9 @@ router.post("/admin/register", (req, res) => {
 });
 router.post("/admin/login", loginUser);
 router.get("/verify", verifyToken);
+router.post("/logout", (req, res) => {
+  // For JWT-based auth, just clear token client-side
+  res.status(200).json({ message: "Logged out successfully" });
+});
 
 export default router;
