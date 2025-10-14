@@ -555,7 +555,20 @@ const handleCardPaid = async (transactionId) => {
       }
     })()} enjoy your shopping,
     <span style={{marginLeft: '10px', fontSize: '14px'}}>
-      Not you? <a href="/signup" style={{color: '#2A110A', textDecoration: 'underline'}}>Log out</a>
+      Not you? 
+     <a
+  href="#"
+  style={{ color: '#2A110A', textDecoration: 'underline' }}
+  onClick={(e) => {
+    e.preventDefault();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/signup';
+  }}
+>
+  Log out
+</a>
+
     </span>
   </>
           ) : (

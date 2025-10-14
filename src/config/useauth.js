@@ -1,6 +1,6 @@
 // src/hooks/useAuth.js
 import { useNavigate, useLocation } from 'react-router-dom';
-
+import { API_BASE_URL } from './api';
 export const useAuth = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,11 +30,22 @@ export const useAuth = () => {
     return { token, user };
   };
 
-  const logout = () => {
+const logout = async () => {
+  try {
+    await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+  } catch (err) {
+    console.error('Logout request failed:', err);
+  } finally {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    navigate('/');
-  };
+    window.location.href = '/signup'; // use hard redirect to clear React state
+  }
+};
+
 
   return { checkAuth, getCurrentUser, logout };
 };
